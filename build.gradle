@@ -1,6 +1,7 @@
 plugins {
     alias libs.plugins.architectury.plugin
     alias libs.plugins.architectury.loom apply false
+    alias libs.plugins.shadow apply false
     alias libs.plugins.forgix
 }
 
@@ -10,6 +11,7 @@ architectury {
 
 subprojects {
     apply plugin: "dev.architectury.loom"
+    apply plugin: "com.github.johnrengelman.shadow"
 
     dependencies {
         minecraft libs.minecraft
