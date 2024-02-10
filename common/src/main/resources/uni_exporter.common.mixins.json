@@ -1,9 +1,9 @@
 {
   "required": true,
-  "package": "ho.artisan.examplemod.mixin",
+  "package": "org.universal.exporter.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "org.universal.exporter.mixin.MixinTitleScreen"
+    "MixinTitleScreen"
   ],
   "mixins": [
   ],

@@ -1,27 +1,30 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "uni_exporter",
   "version": "${version}",
-  "name": "Example Mod",
+  "name": "UniversalExporter",
   "description": "This is an example description! Tell everyone what your mod is about!",
   "authors": [
-    "Me!"
+    "UniversalExporters"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",
     "sources": "https://github.com/FabricMC/fabric-example-mod"
   },
-  "license": "Insert License Here",
-  "icon": "assets/examplemod/icon.png",
+  "license": "GPLv3",
+  "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.universal.exporter.fabric.ExampleModFabric"
+      "org.universal.exporter.fabric.UniExporterFabric"
     ]
   },
+  "mixins": [
+    "uni_exporter.common.mixins.json", "uni_exporter.fabric.mixins.json"
+  ],
   "depends": {
     "fabric": "*",
-    "minecraft": ">=1.19.2",
-    "architectury": ">=6.2.43"
+    "minecraft": "1.20~1.20.1",
+    "architectury": "*"
   }
 }

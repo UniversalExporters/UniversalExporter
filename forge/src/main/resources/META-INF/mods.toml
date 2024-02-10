@@ -1,35 +1,28 @@
 modLoader = "javafml"
 loaderVersion = "[43,)"
 #issueTrackerURL = ""
-license = "Insert License Here"
+license = "GPLv3"
 
 [[mods]]
-modId = "examplemod"
+modId = "uni_exporter"
 version = "${version}"
-displayName = "Example Mod"
-authors = "Me!"
+displayName = "UniversalExporter"
+authors = "UniversalExporters"
 description = '''
 This is an example description! Tell everyone what your mod is about!
 '''
-#logoFile = ""
+logoFile = "icon.png"
 
-[[dependencies.examplemod]]
-modId = "forge"
-mandatory = true
-versionRange = "[43,)"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.examplemod]]
+[[dependencies.uni_exporter]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.2,)"
+versionRange = "[1.20,1.20.1]"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.examplemod]]
+[[dependencies.uni_exporter]]
 modId = "architectury"
 mandatory = true
-versionRange = "[6.2.43,)"
+versionRange = "*"
 ordering = "AFTER"
 side = "BOTH"

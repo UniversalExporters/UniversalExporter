@@ -1,11 +1,11 @@
 package org.universal.exporter.fabric;
 
-import org.universal.exporter.ExampleMod;
+import org.universal.exporter.UniExporter;
 import net.fabricmc.api.ModInitializer;
 
-public class ExampleModFabric implements ModInitializer {
+public class UniExporterFabric implements ModInitializer {
     @Override
     public void onInitialize() {
-        ExampleMod.init();
+        UniExporter.init();
     }
 }
