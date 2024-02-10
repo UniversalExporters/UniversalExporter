@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "ho.artisan.examplemod.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "org.universal.exporter.mixin.MixinTitleScreen"
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
