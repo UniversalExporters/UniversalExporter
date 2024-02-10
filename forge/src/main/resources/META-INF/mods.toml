@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[43,)"
 #issueTrackerURL = ""
-license = "GPLv3"
+license = "AGPLv3"
 
 [[mods]]
 modId = "uni_exporter"
