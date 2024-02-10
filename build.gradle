@@ -1,19 +1,19 @@
 plugins {
-    id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.5-SNAPSHOT" apply false
-    id "io.github.pacifistmc.forgix" version "1.+"
+    alias libs.plugins.architectury.plugin
+    alias libs.plugins.architectury.loom apply false
+    alias libs.plugins.forgix
 }
 
 architectury {
-    minecraft = rootProject.minecraft_version
+    minecraft = libs.versions.minecraft
 }
 
 subprojects {
     apply plugin: "dev.architectury.loom"
 
     dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
+        minecraft libs.minecraft
+        mappings variantOf(libs.yarn.mappings) { classifier "v2" }
     }
 }
 
@@ -23,7 +23,7 @@ allprojects {
     apply plugin: "maven-publish"
 
     archivesBaseName = rootProject.archives_base_name
-    version = "${rootProject.mod_version}+mc${rootProject.minecraft_version}"
+    version = "${rootProject.mod_version}+mc${libs.versions.minecraft.get()}"
     group = rootProject.maven_group
 
     repositories {
