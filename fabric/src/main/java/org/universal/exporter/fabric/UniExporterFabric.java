@@ -1,7 +1,7 @@
 package org.universal.exporter.fabric;
 
-import org.universal.exporter.UniExporter;
 import net.fabricmc.api.ModInitializer;
+import org.universal.exporter.UniExporter;
 
 public class UniExporterFabric implements ModInitializer {
     @Override

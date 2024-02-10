@@ -6,29 +6,41 @@ plugins {
 }
 
 architectury {
-    minecraft = libs.versions.minecraft
+    minecraft = libs.versions.minecraft.get()
 }
 
+final def architecturyLoom = libs.plugins.architectury.loom.get().pluginId
+final def architecturyPlugin = libs.plugins.architectury.plugin.get().pluginId
+final def shadow = libs.plugins.shadow.get().pluginId
+def maven_group = libs.versions.maven.group.get()
+
+
 subprojects {
-    apply plugin: "dev.architectury.loom"
-    apply plugin: "com.github.johnrengelman.shadow"
+    apply {
+        plugin(architecturyLoom)
+        plugin(shadow)
+    }
 
     dependencies {
-        minecraft libs.minecraft
+        minecraft libs.minecraft.get()
         mappings variantOf(libs.yarn.mappings) { classifier "v2" }
     }
 }
 
 allprojects {
-    apply plugin: "java"
-    apply plugin: "architectury-plugin"
-    apply plugin: "maven-publish"
+    apply {
+        plugin("java")
+        plugin(architecturyPlugin)
+        plugin("maven-publish")
+    }
 
     archivesBaseName = rootProject.archives_base_name
     version = "${rootProject.mod_version}+mc${libs.versions.minecraft.get()}"
-    group = rootProject.maven_group
+
+    group = maven_group
 
     repositories {
+        mavenLocal()
         // Add repositories to retrieve artifacts from in here.
         // You should only use this when depending on other mods because
         // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
@@ -36,7 +48,7 @@ allprojects {
         // for more information about repositories.
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         options.encoding = "UTF-8"
         options.release = 17
     }

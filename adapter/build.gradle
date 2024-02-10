@@ -1,0 +1,41 @@
+plugins {
+    id("java")
+    id("maven-publish")
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+group = libs.versions.maven.group.get()
+base.archivesName = "UniversalExporter-adaptor"
+version = "0.1.0"
+
+dependencies {
+    implementation(libs.gson)
+}
+
+java {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release = 8
+}
+publishing {
+    publications {
+        mavenAdapter(MavenPublication) {
+            artifactId = "UniversalExporter-adaptor"
+
+            from components.java
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        mavenLocal()
+    }
+}

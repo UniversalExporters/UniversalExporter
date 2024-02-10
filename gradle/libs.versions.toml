@@ -1,8 +1,15 @@
 [versions]
+
+# project settings
+
+maven-group= "org.uniexporter.exporter"
+
+# platform settings
 architectury_loom = "1.5-SNAPSHOT"
 architectury_plugin = "3.4-SNAPSHOT"
 shadow = "8.+"
 forgix = "1.+"
+
 
 # The latest versions are available at https://linkie.shedaniel.dev/dependencies
 minecraft = "1.20.1"
@@ -15,10 +22,13 @@ fabric_api = "0.91.1+1.20.1"
 
 forge = "1.20.1-47.2.20"
 
+gson = "2.10.1"
+
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
 yarn_mappings = { module = "net.fabricmc:yarn", version.ref = "yarn_mappings" }
 architectury_api = { module = "dev.architectury:architectury", version.ref = "architectury_api" }
+gson= { module="com.google.code.gson:gson", version.ref="gson" }
 
 fabric_loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric_loader" }
 fabric_api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric_api" }
