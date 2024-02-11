@@ -1,9 +1,7 @@
 package org.universal.exporter.command;
 
-import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.AdvancementDisplay;
@@ -13,7 +11,10 @@ import net.minecraft.block.FluidBlock;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.item.*;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.BucketItem;
+import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
@@ -21,9 +22,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.function.CommandFunction;
-import net.minecraft.text.*;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Language;
 import net.minecraft.util.Pair;
 import org.uniexporter.exporter.adapter.serializable.AdvancementSerializable;
 import org.uniexporter.exporter.adapter.serializable.Advancements;
@@ -40,26 +40,25 @@ import org.universal.exporter.command.argument.ExporterArgumentType;
 import org.universal.exporter.command.type.ExporterType;
 import org.universal.exporter.platform.Mod;
 import org.universal.exporter.utils.Base64Helper;
-import org.universal.exporter.utils.FrameHelper;
 import org.universal.exporter.utils.ItemAndBlockHelper;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
-import static net.minecraft.util.Language.load;
 import static org.universal.exporter.utils.LanguageHelper.en_us;
 import static org.universal.exporter.utils.LanguageHelper.zh_cn;
-
 /**
  * uex exporter command
  * @author baka4n
@@ -102,11 +101,14 @@ public class ExporterCommand {
         var mods = UniExporterExpectPlatform.getMods();
 
         MinecraftServer server = context.getSource().getServer();
+
         List<Advancement> advancements = server.getAdvancementLoader().getAdvancements().stream().toList();
         ExecutorService executorService = Executors.newFixedThreadPool(mods.size());
         CompletableFuture<?>[] futures = new CompletableFuture[mods.size()];
         for (int i = 0; i < mods.size(); i++) {
             Mod mod = mods.get(i);
+            Path advancementsJson = UniExporter.exporter.resolve(mod.modid).resolve("advancements.json");
+
             futures[i] = CompletableFuture.runAsync(() -> {
                 List<Advancement> parents = advancements.stream().filter(advancement -> advancement.getParent() == null).toList();
                 Advancements modidAdvancements = new Advancements();
@@ -165,12 +167,14 @@ public class ExporterCommand {
                                 .registerName(entry.getValue().getConditions().getId().toString()));
                     }
                     String[][] requirements = parent.getRequirements();
-                    modidAdvancements.advancement(advancement);
+
                     for (String[] requirement : requirements)
                         advancement.requirements(requirement);
                     advancement.sendsTelemetryEvent(parent.sendsTelemetryEvent());
 
+                    modidAdvancements.advancement(advancement);
                 }
+                modidAdvancements.save(advancementsJson);
             });
 
         }
@@ -199,8 +203,6 @@ public class ExporterCommand {
                 String modid = mod.modid;
                 Path itemAndBlocksJson = UniExporter.exporter.resolve(modid).resolve("item-and-block.json");
                 var registry = Registries.ITEM;
-                Path parent = itemAndBlocksJson.getParent();
-                if (!Files.exists(parent)) parent.toFile().mkdirs();
                 List<Identifier> registryIds = registry.getIds().stream().filter(identifier -> identifier.getNamespace().equals(modid)).toList();
                 for (Identifier registryId : registryIds) {
                     Item item = registry.get(registryId);
