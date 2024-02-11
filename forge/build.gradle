@@ -29,6 +29,8 @@ dependencies {
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+    minecraftClientLibraries(libs.adapter)
+    include(libs.adapter)
 }
 
 processResources {

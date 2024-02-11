@@ -9,7 +9,7 @@ public class ItemType {
     public String smallIcon;
     public String largeIcon;
     public BlockType asBlock;
-    public FluidType asFluid;
+    public String asFluid;
 
     public String type;
 
@@ -50,7 +50,7 @@ public class ItemType {
         return this;
     }
 
-    public ItemType asFluid(FluidType asFluid) {
+    public ItemType asFluid(String asFluid) {
         this.asFluid = asFluid;
         return this;
     }

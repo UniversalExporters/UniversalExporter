@@ -24,6 +24,9 @@ forge = "1.20.1-47.2.20"
 
 gson = "2.10.1"
 
+# project version
+adapter = "0.1.0"
+
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
 yarn_mappings = { module = "net.fabricmc:yarn", version.ref = "yarn_mappings" }
@@ -36,6 +39,8 @@ architectury_api_fabric = { module = "dev.architectury:architectury-fabric", ver
 
 forge = { module = "net.minecraftforge:forge", version.ref = "forge" }
 architectury_api_forge = { module = "dev.architectury:architectury-forge", version.ref = "architectury_api" }
+
+adapter = { module = "org.uniexporter.exporter:UniversalExporter-adaptor", version.ref="adapter" }
 
 [plugins]
 architectury_loom = { id = "dev.architectury.loom", version.ref = "architectury_loom" }

@@ -5,6 +5,8 @@ public class BlockType {
     public float hardness;
     public float resistance;
 
+    public FluidType asFluid;
+
     public BlockType luminance(int luminance) {
         this.luminance = luminance;
         return this;
@@ -17,6 +19,11 @@ public class BlockType {
 
     public BlockType resistance(float resistance) {
         this.resistance = resistance;
+        return this;
+    }
+
+    public BlockType asFluid(FluidType asFluid) {
+        this.asFluid = asFluid;
         return this;
     }
 }
