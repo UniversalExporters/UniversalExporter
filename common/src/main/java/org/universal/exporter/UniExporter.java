@@ -15,6 +15,7 @@ public class UniExporter {
     public static final Path exporter = Platform.getGameFolder().resolve("exporter");
 
     public static void init() {
+
         CommandRegistrationEvent.EVENT.register(ExporterCommand::register);
         LOGGER.info(UniExporterExpectPlatform.getConfigDirectory().toAbsolutePath().normalize().toString());
     }

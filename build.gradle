@@ -59,7 +59,7 @@ allprojects {
 }
 
 forgix {
-    group = rootProject.maven_group
+    group = maven_group
     mergedJarName = "${rootProject.archives_base_name}-${rootProject.version}.jar"
     outputDir = "build/libs/forgix"
 

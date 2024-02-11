@@ -3,9 +3,13 @@ package org.universal.exporter.command;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
+import dev.architectury.platform.Mod;
+import dev.architectury.platform.Platform;
 import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.item.Item;
+import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.OrderedText;
@@ -15,18 +19,19 @@ import net.minecraft.text.TextVisitFactory;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Language;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
+import org.uniexporter.exporter.adapter.serializable.BlockAndItems;
+import org.uniexporter.exporter.adapter.serializable.type.ItemType;
 import org.universal.exporter.UniExporter;
 import org.universal.exporter.command.argument.ExporterArgumentType;
 import org.universal.exporter.command.type.ExporterType;
+import org.universal.exporter.utils.Base64Helper;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 
 import static net.minecraft.server.command.CommandManager.argument;
@@ -34,6 +39,8 @@ import static net.minecraft.server.command.CommandManager.literal;
 import static net.minecraft.util.Language.load;
 
 public class ExporterCommand {
+
+    private static Language en_us, zh_cn;
 
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment env) {
@@ -45,38 +52,85 @@ public class ExporterCommand {
     private static int select(CommandContext<ServerCommandSource> context) {
         ExporterType select = ExporterArgumentType.getExporter(context, "select");
         if (select.equals(ExporterType.item)) {
-            itemExporter();
+            itemAndBlockExporter();
         }
         return 1;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void itemExporter() {
+    public static void itemAndBlockExporter() {
+
+        BlockAndItems blockAndItems = new BlockAndItems();
+
         Set<Identifier> ids = Registries.ITEM.getIds();
-        Path items = UniExporter.exporter.resolve("items");
-        for (Identifier id : ids) {
-            Path resolve = items.resolve(id.getNamespace()).resolve(id.getPath() + ".json");
-            Path parent = resolve.getParent();
-            if (!Files.exists(parent)) parent.toFile().mkdirs();
-            try(BufferedWriter bw = Files.newBufferedWriter(resolve)) {
-                Item item = Registries.ITEM.get(id);
 
-                new BlockAndItemSerializable()
-                        .englishName(en_us().get(item.getTranslationKey()))
-                        .englishName(zh_cn().get(item.getTranslationKey()));
-            } catch (IOException ignored) {
-                UniExporter.LOGGER.info("export error: {}", resolve);
-            }
+        var mods = Platform.getMods().stream().toList();
 
+        ExecutorService executorService = Executors.newFixedThreadPool(mods.size());
+        CompletableFuture<?>[] futures = new CompletableFuture[mods.size()];
+        for (int i = 0; i < mods.size(); i++) {
+            final Mod mod = mods.get(i);
+            futures[i] = CompletableFuture.runAsync(() -> {
+                BlockAndItemSerializable serializable = new BlockAndItemSerializable();String modid = mod.getModId();
+                Path itemAndBlocksJson = UniExporter.exporter.resolve(modid).resolve("item-and-block.json");
+                var registry = Registries.ITEM;
+                Path parent = itemAndBlocksJson.getParent();
+                if (!Files.exists(parent)) parent.toFile().mkdirs();
+                List<Identifier> registryIds = registry.getIds().stream().filter(identifier -> identifier.getNamespace().equals(modid)).toList();
+                for (Identifier registryId : registryIds) {
+                    Item item = registry.get(registryId);
+                    ItemType type = new ItemType()
+                            .maxStackSize(item.getMaxCount())
+                            .maxDurability(item.getMaxDamage());
+                    TagKey.codec(RegistryKeys.ITEM).map(itemTagKey -> {
+                        if (item.getDefaultStack().itemMatches(itemRegistryEntry -> itemRegistryEntry.isIn(itemTagKey))) {
+                            type.OredictList(itemTagKey.id().toString());
+                        }
+                        return itemTagKey;
+                    });
+                    new Base64Helper(type).itemToBase(item);
+                    serializable
+                            .englishName(en_us().get(item.getTranslationKey()))
+                            .name(zh_cn().get(item.getTranslationKey()));
+                    if (item instanceof BlockItem blockItem) {
+
+                    } else if (item instanceof MiningToolItem tool) {
+
+                    } else if (item instanceof BucketItem fluid) {
+
+                    } else if (item instanceof ArmorItem armor) {
+
+                    } else {
+                        serializable
+                                .type(type.type("item"));
+                    }
+                    blockAndItems.items.put(registryId.toString(), serializable);
+                }
+            }, executorService);
         }
+        wait(futures);
     }
 
+    public static void wait(CompletableFuture<?>[] futures) {
+        boolean done = true;
+        for (CompletableFuture<?> future : futures) {
+            if (!future.isDone()) {
+                done = false;
+                break;
+            }
+        }
+        if (!done) wait(futures);
+    }
+
+
     public static Language en_us() {
-        return create("en_us");
+        if (en_us == null) en_us = create("en_us");
+        return en_us;
     }
 
     public static Language zh_cn() {
-        return create("zh_cn");
+        if (zh_cn == null) zh_cn = create("zh_cn");
+        return zh_cn;
     }
 
     public static Language create(String language) {

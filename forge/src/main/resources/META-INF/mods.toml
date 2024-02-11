@@ -1,12 +1,13 @@
 modLoader = "javafml"
 loaderVersion = "[43,)"
-#issueTrackerURL = ""
+issueTrackerURL = "https://github.com/UniversalExporters/UniversalExporter/isssues"
 license = "AGPLv3"
 
 [[mods]]
 modId = "uni_exporter"
 version = "${version}"
 displayName = "UniversalExporter"
+displayURL = "https://github.com/UniversalExporters/UniversalExporter"
 authors = "UniversalExporters"
 description = '''
 This is an example description! Tell everyone what your mod is about!

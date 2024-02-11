@@ -1,13 +1,14 @@
 package org.uniexporter.exporter.adapter.serializable;
 
-import org.uniexporter.exporter.adapter.serializable.type.Type;
+import org.uniexporter.exporter.adapter.serializable.type.ItemType;
 
 public class BlockAndItemSerializable {
     public String name;
     public String englishName;
-    public String registerName;
 
-    public Type type;
+    public ItemType type;
+
+
 
     public BlockAndItemSerializable name(String name) {
         this.name = name;
@@ -19,12 +20,7 @@ public class BlockAndItemSerializable {
         return this;
     }
 
-    public BlockAndItemSerializable registerName(String registerName) {
-        this.registerName = registerName;
-        return this;
-    }
-
-    public BlockAndItemSerializable type(Type type) {
+    public BlockAndItemSerializable type(ItemType type) {
         this.type = type;
         return this;
     }
