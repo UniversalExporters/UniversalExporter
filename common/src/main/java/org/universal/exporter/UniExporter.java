@@ -4,7 +4,7 @@ import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.platform.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.universal.exporter.command.ExporterItemCommand;
+import org.universal.exporter.command.ExporterCommand;
 
 import java.nio.file.Path;
 
@@ -15,7 +15,7 @@ public class UniExporter {
     public static final Path exporter = Platform.getGameFolder().resolve("exporter");
 
     public static void init() {
-        CommandRegistrationEvent.EVENT.register(ExporterItemCommand::register);
+        CommandRegistrationEvent.EVENT.register(ExporterCommand::register);
         LOGGER.info(UniExporterExpectPlatform.getConfigDirectory().toAbsolutePath().normalize().toString());
     }
 }

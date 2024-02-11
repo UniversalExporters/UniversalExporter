@@ -33,13 +33,13 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 import static net.minecraft.util.Language.load;
 
-public class ExporterItemCommand {
+public class ExporterCommand {
 
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment env) {
         dispatcher.register(literal("ue")
                 .then(argument("select", ExporterArgumentType.exporter())
-                        .executes(ExporterItemCommand::select)));
+                        .executes(ExporterCommand::select)));
     }
 
     private static int select(CommandContext<ServerCommandSource> context) {

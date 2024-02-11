@@ -8,8 +8,8 @@
     "UniversalExporters"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://github.com/UniversalExporters",
+    "sources": "https://github.com/UniversalExporters/UniversalExporter"
   },
   "license": "AGPLv3",
   "icon": "icon.png",
