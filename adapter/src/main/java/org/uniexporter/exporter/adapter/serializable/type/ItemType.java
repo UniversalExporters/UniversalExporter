@@ -1,13 +1,14 @@
 package org.uniexporter.exporter.adapter.serializable.type;
 
+import org.uniexporter.exporter.adapter.faces.Self;
+
 import java.util.ArrayList;
 
-public class ItemType {
+public class ItemType implements Self<ItemType> {
     public Integer maxStackSize;
     public Integer maxDurability;
     public ArrayList<String> OredictList;
-    public String smallIcon;
-    public String largeIcon;
+    public IconType icon;
     public BlockType asBlock;
     public String asFluid;
 
@@ -22,36 +23,31 @@ public class ItemType {
     public ItemType OredictList(String oredictList) {
         if (OredictList == null) OredictList = new ArrayList<>();
         OredictList.add(oredictList);
-        return this;
+        return self();
     }
 
     public ItemType maxStackSize(Integer maxStackSize) {
         this.maxStackSize = maxStackSize;
-        return this;
+        return self();
     }
 
     public ItemType maxDurability(Integer maxDurability) {
         this.maxDurability = maxDurability;
-        return this;
+        return self();
     }
 
-    public ItemType largeIcon(String largeIcon) {
-        this.largeIcon = largeIcon;
-        return this;
-    }
-
-    public ItemType smallIcon(String smallIcon) {
-        this.smallIcon = smallIcon;
-        return this;
+    public ItemType icon(IconType icon) {
+        this.icon = icon;
+        return self();
     }
 
     public ItemType asBlock(BlockType asBlock) {
         this.asBlock = asBlock;
-        return this;
+        return self();
     }
 
     public ItemType asFluid(String asFluid) {
         this.asFluid = asFluid;
-        return this;
+        return self();
     }
 }

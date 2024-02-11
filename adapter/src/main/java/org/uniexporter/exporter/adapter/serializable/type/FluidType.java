@@ -1,6 +1,8 @@
 package org.uniexporter.exporter.adapter.serializable.type;
 
-public class FluidType {
+import org.uniexporter.exporter.adapter.faces.Self;
+
+public class FluidType implements Self<FluidType> {
     public boolean canSwim;
     public boolean canDrown;
     public boolean supportsBoating;
@@ -10,26 +12,26 @@ public class FluidType {
 
     public FluidType canSwim(boolean canSwim) {
         this.canSwim = canSwim;
-        return this;
+        return self();
     }
 
     public FluidType canDrown(boolean canDrown) {
         this.canDrown = canDrown;
-        return this;
+        return self();
     }
 
     public FluidType supportsBoating(boolean supportsBoating) {
         this.supportsBoating = supportsBoating;
-        return this;
+        return self();
     }
 
     public FluidType asBucket(String asBucket) {
         this.asBucket = asBucket;
-        return this;
+        return self();
     }
 
     public FluidType source(boolean source) {
         isSource = source;
-        return this;
+        return self();
     }
 }

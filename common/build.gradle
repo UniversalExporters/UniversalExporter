@@ -1,9 +1,5 @@
 architectury {
-    common("fabric")
-}
-
-loom {
-    accessWidenerPath = file("src/main/resources/uni_exporter.accesswidener")
+    common("fabric", "forge")
 }
 
 dependencies {
@@ -14,18 +10,4 @@ dependencies {
     implementation(libs.adapter)
 
 
-}
-
-publishing {
-    publications {
-        mavenCommon(MavenPublication) {
-            artifactId = rootProject.archives_base_name
-            from components.java
-        }
-    }
-
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-    }
 }

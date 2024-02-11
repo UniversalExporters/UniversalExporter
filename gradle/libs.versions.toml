@@ -2,7 +2,9 @@
 
 # project settings
 
-maven-group= "org.uniexporter.exporter"
+maven-group = "org.uniexporter.exporter"
+archives-base-name = "UniversalExporter"
+mod-version = "0.1.0"
 
 # platform settings
 architectury_loom = "1.5-SNAPSHOT"

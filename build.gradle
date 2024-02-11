@@ -13,17 +13,37 @@ final def architecturyLoom = libs.plugins.architectury.loom.get().pluginId
 final def architecturyPlugin = libs.plugins.architectury.plugin.get().pluginId
 final def shadow = libs.plugins.shadow.get().pluginId
 def maven_group = libs.versions.maven.group.get()
+def archives_base_name = libs.versions.archives.base.name.get()
+def mod_version = libs.versions.mod.version.get()
 
 
 subprojects {
     apply {
         plugin(architecturyLoom)
         plugin(shadow)
+        plugin("maven-publish")
+    }
+
+    loom {
+        accessWidenerPath = project(":common").file("src/main/resources/uni_exporter.accesswidener")
     }
 
     dependencies {
         minecraft libs.minecraft.get()
         mappings variantOf(libs.yarn.mappings) { classifier "v2" }
+    }
+    publishing {
+        publications {
+            create(project.name + "Maven", MavenPublication) {
+                artifactId = archives_base_name
+                from components.java
+            }
+        }
+
+        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+        repositories {
+            // Add repositories to publish to here.
+        }
     }
 }
 
@@ -34,12 +54,13 @@ allprojects {
         plugin("maven-publish")
     }
 
-    archivesBaseName = rootProject.archives_base_name
-    version = "${rootProject.mod_version}+mc${libs.versions.minecraft.get()}"
+    archivesBaseName = archives_base_name
+    version = "${mod_version}+mc${libs.versions.minecraft.get()}"
 
     group = maven_group
 
     repositories {
+        mavenLocal()
         maven {
             url rootProject.file("./maven-repo/")
         }
@@ -62,16 +83,16 @@ allprojects {
 
 forgix {
     group = maven_group
-    mergedJarName = "${rootProject.archives_base_name}-${rootProject.version}.jar"
+    mergedJarName = "${archives_base_name}-${rootProject.version}.jar"
     outputDir = "build/libs/forgix"
 
     forge {
         projectName = "forge"
-        jarLocation = "build/libs/${rootProject.archives_base_name}-forge-${rootProject.version}.jar"
+        jarLocation = "build/libs/${archives_base_name}-forge-${rootProject.version}.jar"
     }
 
     fabric {
         projectName = "fabric"
-        jarLocation = "build/libs/${rootProject.archives_base_name}-fabric-${rootProject.version}.jar"
+        jarLocation = "build/libs/${archives_base_name}-fabric-${rootProject.version}.jar"
     }
 }

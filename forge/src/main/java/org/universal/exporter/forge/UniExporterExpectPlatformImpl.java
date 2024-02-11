@@ -1,14 +1,17 @@
 package org.universal.exporter.forge;
 
-import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.fluid.FlowableFluid;
-import net.minecraft.item.Items;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.forgespi.language.IModInfo;
 import org.uniexporter.exporter.adapter.serializable.type.FluidType;
 import org.universal.exporter.UniExporterExpectPlatform;
+import org.universal.exporter.platform.Mod;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class UniExporterExpectPlatformImpl {
     /**
@@ -27,6 +30,15 @@ public class UniExporterExpectPlatformImpl {
     }
 
     public static Path getGameFolder() { return FMLPaths.GAMEDIR.get(); }
+
+    public static List<Mod> getMods() {
+        ModList modList = ModList.get();
+        List<Mod> list = new ArrayList<>();
+        for (IModInfo mod : modList.getMods()) {
+            list.add(new Mod(mod.getModId()));
+        }
+        return list;
+    }
 
 
 }

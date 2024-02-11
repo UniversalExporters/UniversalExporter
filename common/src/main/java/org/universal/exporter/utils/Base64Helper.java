@@ -5,6 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
+import org.uniexporter.exporter.adapter.serializable.type.IconType;
 import org.uniexporter.exporter.adapter.serializable.type.ItemType;
 import org.universal.exporter.UniExporter;
 
@@ -24,19 +25,28 @@ public class Base64Helper {
 
     public void itemStackToBase(ItemStack stack) {
 
-        var pair = FrameHelper.of(stack);
-        try (NativeImage smallImg = pair.getLeft().dumpFrom()) {
-            serializable.smallIcon(Base64.getEncoder().encodeToString(smallImg.getBytes()));
-
-        } catch (IOException e) {
-            UniExporter.LOGGER.error("don't find {}", stack.getItem().getName());
-        }
-        try (NativeImage largeImg = pair.getRight().dumpFrom()) {
-            serializable.largeIcon(Base64.getEncoder().encodeToString(largeImg.getBytes()));
+        try {
+            Pair<String, String> pair = itemStackToBase64(stack);
+            serializable.icon(new IconType()
+                    .smallIcon(pair.getLeft())
+                    .largeIcon(pair.getRight()));
         } catch (IOException e) {
             UniExporter.LOGGER.error("don't find {}", stack.getItem().getName());
         }
 
+    }
+
+    public static Pair<String, String> itemStackToBase64(ItemStack stack) throws IOException {
+        Pair<FrameHelper, FrameHelper> pair = FrameHelper.of(stack);
+        String smallBase64, largeBase64;
+        try(NativeImage nativeImage = pair.getLeft().dumpFrom()) {
+            smallBase64 = Base64.getEncoder().encodeToString(nativeImage.getBytes());
+        }
+        try(NativeImage nativeImage = pair.getRight().dumpFrom()) {
+            largeBase64 = Base64.getEncoder().encodeToString(nativeImage.getBytes());
+        }
+
+        return new Pair<>(smallBase64, largeBase64);
     }
 
 }

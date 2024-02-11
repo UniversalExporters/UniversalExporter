@@ -1,2 +1,7 @@
 accessWidener   v2  named
 accessible method net/minecraft/util/Language load (Ljava/util/function/BiConsumer;Ljava/lang/String;)V
+accessible field net/minecraft/item/BucketItem fluid Lnet/minecraft/fluid/Fluid;
+accessible field net/minecraft/advancement/AdvancementRewards experience I
+accessible field net/minecraft/advancement/AdvancementRewards loot [Lnet/minecraft/util/Identifier;
+accessible field net/minecraft/advancement/AdvancementRewards function Lnet/minecraft/server/function/CommandFunction$LazyContainer;
+accessible field net/minecraft/advancement/Advancement text Lnet/minecraft/text/Text;
