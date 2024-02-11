@@ -25,12 +25,13 @@ configurations {
 
 dependencies {
     forge libs.forge
-    modApi libs.architectury.api.forge
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
     minecraftClientLibraries(libs.adapter)
+    minecraftClientLibraries(libs.gson)
     include(libs.adapter)
+    include(libs.gson)
 }
 
 processResources {

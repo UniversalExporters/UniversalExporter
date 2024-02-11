@@ -1,0 +1,89 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.uniexporter.exporter",
+    "module": "UniversalExporter-adaptor",
+    "version": "0.1.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.6"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "UniversalExporter-adaptor-0.1.0.jar",
+          "url": "UniversalExporter-adaptor-0.1.0.jar",
+          "size": 9738,
+          "sha512": "c8b488e8e187311cddc3ca5f95e269f861da36130a11055f1d8beb375513ec4cf6b9e904e6951a761468f4a55f81fff69a8452b798e0a7f4426455cd7270f37a",
+          "sha256": "84023fcbe158b77df1abbf462f9c0581bfbfa75916c96fd1a4db8c6c2f00ff8a",
+          "sha1": "62c8bbc87b6e23f43189480d25c9949a41bd7242",
+          "md5": "e3c82e612e862b8081341164ce645614"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.google.code.gson",
+          "module": "gson",
+          "version": {
+            "requires": "2.10.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "UniversalExporter-adaptor-0.1.0.jar",
+          "url": "UniversalExporter-adaptor-0.1.0.jar",
+          "size": 9738,
+          "sha512": "c8b488e8e187311cddc3ca5f95e269f861da36130a11055f1d8beb375513ec4cf6b9e904e6951a761468f4a55f81fff69a8452b798e0a7f4426455cd7270f37a",
+          "sha256": "84023fcbe158b77df1abbf462f9c0581bfbfa75916c96fd1a4db8c6c2f00ff8a",
+          "sha1": "62c8bbc87b6e23f43189480d25c9949a41bd7242",
+          "md5": "e3c82e612e862b8081341164ce645614"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "UniversalExporter-adaptor-0.1.0-sources.jar",
+          "url": "UniversalExporter-adaptor-0.1.0-sources.jar",
+          "size": 6636,
+          "sha512": "0eb21e4e9200ffeb31d49ae70fa7e537b08972df8f7e1d0f0d7a2a2a42d79f03884c380ec505c43440e8e982493e6f43bc117466ee93c3ee0c764b1e573677b3",
+          "sha256": "6794d1e90e7010360ab1aa55f3d2abbe3a96bf9e26cf09650156c9d688855557",
+          "sha1": "e24bb47404bbc8efa80f7da5143e5c023bdd623c",
+          "md5": "1c14c030b1a248e8abcf9de45ad5655b"
+        }
+      ]
+    }
+  ]
+}

@@ -19,5 +19,7 @@ public class UniExporterExpectPlatformImpl {
         return source;
     }
 
+    public static Path getGameFolder() { return FabricLoader.getInstance().getGameDir(); }
+
 
 }

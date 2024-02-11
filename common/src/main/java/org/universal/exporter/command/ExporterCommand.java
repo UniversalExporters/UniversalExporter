@@ -3,26 +3,20 @@ package org.universal.exporter.command;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import dev.architectury.core.fluid.ArchitecturyFlowingFluid;
-import dev.architectury.core.fluid.ArchitecturyFluidAttributes;
 import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
-import net.minecraft.block.AbstractBlock;
+import net.minecraft.advancement.Advancement;
 import net.minecraft.block.Block;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.*;
-import net.minecraft.predicate.entity.EntityTypePredicate;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.OrderedText;
@@ -40,7 +34,6 @@ import org.universal.exporter.UniExporter;
 import org.universal.exporter.UniExporterExpectPlatform;
 import org.universal.exporter.command.argument.ExporterArgumentType;
 import org.universal.exporter.command.type.ExporterType;
-import org.universal.exporter.utils.Base64Helper;
 import org.universal.exporter.utils.ItemAndBlockHelper;
 
 import java.nio.file.Files;
@@ -51,16 +44,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 import static net.minecraft.util.Language.load;
 
 public class ExporterCommand {
-
-
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment env) {
         dispatcher.register(literal("ue")
@@ -70,14 +59,28 @@ public class ExporterCommand {
 
     private static int select(CommandContext<ServerCommandSource> context) {
         ExporterType select = ExporterArgumentType.getExporter(context, "select");
-        if (select.equals(ExporterType.item)) {
-            itemAndBlockExporter(context);
+        if (select.equals(ExporterType.itemAndBlock)) {
+            itemAndBlockExporterAll(context);
+        } else if (select.equals(ExporterType.advancements)) {
+
         }
         return 1;
     }
 
+    public static void advancementsAll(CommandContext<ServerCommandSource> context) {
+        var mods = Platform.getMods().stream().toList();
+        MinecraftServer server = context.getSource().getServer();
+        List<Advancement> list = server.getAdvancementLoader().getAdvancements().stream().toList();
+
+        for (int i = 0; i < mods.size(); i++) {
+            Mod mod = mods.get(i);
+            List<Advancement> modAdvancements = list.stream().filter(advancement -> advancement.getId().getNamespace().equals(mod.getModId())).toList();
+
+        }
+    }
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void itemAndBlockExporter(CommandContext<ServerCommandSource> context) {
+    public static void itemAndBlockExporterAll(CommandContext<ServerCommandSource> context) {
 
         BlockAndItems blockAndItems = new BlockAndItems();
 

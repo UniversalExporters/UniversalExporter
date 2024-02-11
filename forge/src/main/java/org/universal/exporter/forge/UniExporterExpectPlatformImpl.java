@@ -26,5 +26,7 @@ public class UniExporterExpectPlatformImpl {
                 .canDrown(fluidType.canDrownIn(null));
     }
 
+    public static Path getGameFolder() { return FMLPaths.GAMEDIR.get(); }
+
 
 }

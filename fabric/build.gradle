@@ -18,11 +18,12 @@ configurations {
 dependencies {
     modImplementation libs.fabric.loader
     modApi libs.fabric.api
-    modApi libs.architectury.api.fabric
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
     implementation(libs.adapter)
+    implementation(libs.gson)
+    include(libs.gson)
     include(libs.adapter)
 }
 
