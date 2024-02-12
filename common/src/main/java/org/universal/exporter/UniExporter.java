@@ -1,9 +1,7 @@
 package org.universal.exporter;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.universal.exporter.command.ExporterCommand;
 
 import java.nio.file.Path;
 
@@ -14,6 +12,6 @@ public class UniExporter {
     public static final Path exporter = UniExporterExpectPlatform.getGameFolder().resolve("exporter");
 
     public static void init() {
-        LOGGER.info(UniExporterExpectPlatform.getConfigDirectory().toAbsolutePath().normalize().toString());
+        LOGGER.info("UniversalExporter is Loaded!");
     }
 }

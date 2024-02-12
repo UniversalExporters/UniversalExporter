@@ -1,6 +1,5 @@
 package org.universal.exporter.fabric;
 
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.fluid.FlowableFluid;
@@ -24,7 +23,9 @@ public class UniExporterExpectPlatformImpl {
         return source;
     }
 
-    public static Path getGameFolder() { return FabricLoader.getInstance().getGameDir(); }
+    public static Path getGameFolder() {
+        return FabricLoader.getInstance().getGameDir();
+    }
 
     public static List<Mod> getMods() {
         List<Mod> mods = new ArrayList<>();
@@ -33,6 +34,4 @@ public class UniExporterExpectPlatformImpl {
         }
         return mods;
     }
-
-
 }

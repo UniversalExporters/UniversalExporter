@@ -3,7 +3,7 @@
   "id": "uni_exporter",
   "version": "${version}",
   "name": "UniversalExporter",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "Universal multi-modloader exporter for mcmod.cn",
   "authors": [
     "UniversalExporters"
   ],

@@ -29,7 +29,9 @@ public class UniExporterExpectPlatformImpl {
                 .canDrown(fluidType.canDrownIn(null));
     }
 
-    public static Path getGameFolder() { return FMLPaths.GAMEDIR.get(); }
+    public static Path getGameFolder() {
+        return FMLPaths.GAMEDIR.get();
+    }
 
     public static List<Mod> getMods() {
         ModList modList = ModList.get();
@@ -39,6 +41,4 @@ public class UniExporterExpectPlatformImpl {
         }
         return list;
     }
-
-
 }

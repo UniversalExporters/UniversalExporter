@@ -7,9 +7,9 @@ pluginManagement {
     }
 }
 
+includeBuild("adapter")
 include("common")
 include("fabric")
 include("forge")
-includeBuild("adapter")
 
 rootProject.name = "UniversalExporter"

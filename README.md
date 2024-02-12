@@ -1,37 +1,38 @@
-<h1 style="font-size: 50px; color: darkorange">Universal Exporter</h1>
-<h6 style="color: aqua">这是一个MC多方面导出库，主要作用于mcmod.cn百科</h6>
-<table>
-<thead>
-<tr>
+<div align="center">
+<img height="100" src="common/src/main/resources/icon.png" width="100"/>
 
-<th>模块</th>
-<th>作用</th>
+# Universal Exporter
 
-</tr>
-<tr>
+适用于 mcmod.cn 的通用多模组加载器的模组内容数据输出器
 
-<th>adapter</th>
-<th>导出的json配置格式</th>
+<img alt="fabric" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/fabric_vector.svg">
+<img alt="forge" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/forge_vector.svg">
 
-</tr>
-<tr>
+</div>
 
-<th>common</th>
-<th>architectury兼容层代码</th>
+## 项目结构
 
-</tr>
-<tr>
+| 模块      | 功能            |
+|:-------:|:-------------:|
+| adapter | 导出的json配置格式   |
+| common  | 多模组加载器之间的通用代码 |
+| fabric  | fabric侧的专用代码  |
+| forge   | forge侧的专用代码   |
 
-<th>fabric</th>
-<th>fabric模组的代码存放</th>
+## 导出格式 (TODO)
 
-</tr>
-<tr>
+| 项目  | 功能  |
+|:---:|:---:|
+|     |     |
+|     |     |
+|     |     |
 
-<th>forge</th>
-<th>forge模组的代码存放</th>
+## 构建
+### 构建环境
+- Java 17及以上版本
+- IntelliJ IDEA
+### 编译
+直接执行 `./gradlew build` 即可。
 
-</tr>
-</thead>
-</table>
-
+## 许可证
+本项目使用AGPLv3许可协议。

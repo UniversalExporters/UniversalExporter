@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[43,)"
+loaderVersion = "*"
 issueTrackerURL = "https://github.com/UniversalExporters/UniversalExporter/isssues"
 license = "AGPLv3"
 
@@ -10,7 +10,7 @@ displayName = "UniversalExporter"
 displayURL = "https://github.com/UniversalExporters/UniversalExporter"
 authors = "UniversalExporters"
 description = '''
-This is an example description! Tell everyone what your mod is about!
+Universal multi-modloader exporter for mcmod.cn
 '''
 logoFile = "icon.png"
 
