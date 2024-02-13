@@ -1,5 +1,5 @@
 <div align="center">
-<a href="#">
+<a href="https://github.com/UniversalExporters/UniversalExporter">
 <img src="common/src/main/resources/icon.png" />
 </a>
 
