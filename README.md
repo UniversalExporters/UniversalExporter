@@ -1,5 +1,7 @@
 <div align="center">
+<a href="#">
 <img src="common/src/main/resources/icon.png" />
+</a>
 
 # Universal Exporter
 
