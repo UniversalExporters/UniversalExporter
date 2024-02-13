@@ -3,8 +3,6 @@
 <img src="common/src/main/resources/icon.png" />
 </a>
 
-# Universal Exporter
-
 适用于 mcmod.cn 的通用多模组加载器的模组内容数据输出器
 
 <img alt="fabric" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/fabric_vector.svg">
