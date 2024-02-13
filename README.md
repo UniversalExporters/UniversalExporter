@@ -1,5 +1,5 @@
 <div align="center">
-<img height="100" src="common/src/main/resources/icon.png" width="100"/>
+<img src="common/src/main/resources/icon.png" />
 
 # Universal Exporter
 
