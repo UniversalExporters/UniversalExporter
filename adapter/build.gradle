@@ -1,3 +1,6 @@
+import java.nio.file.Files
+import java.nio.file.Path
+
 plugins {
     id("java")
     id("maven-publish")
@@ -37,8 +40,13 @@ publishing {
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
         mavenLocal()
-        maven {
-            url rootProject.file("../maven-repo/")
-        }
+    }
+}
+
+Path mavenDir = Path.of(System.getProperty("user.home")).resolve(".m2").resolve("repository").resolve(libs.versions.maven.group.get().replace(".", "/")).resolve("UniversalExporter-adaptor").resolve("0.1.0")
+
+if (!Files.exists(mavenDir)) {
+    tasks.withType(PublishToMavenLocal).configureEach {
+        it.publish()
     }
 }
