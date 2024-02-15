@@ -33,10 +33,7 @@ public class AdvancementDisplayType implements Self<AdvancementDisplayType> {
         return self();
     }
     public AdvancementDisplayType background(String background) {
-        try {
-            advancementParameters("background", background);
-        } catch (Exception ignored) {}
-        return self();
+        return advancementParameters("background", background);
     }
     public AdvancementDisplayType frame(String frame) {
         this.frame = frame;

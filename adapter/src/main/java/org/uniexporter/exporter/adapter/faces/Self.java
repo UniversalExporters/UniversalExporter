@@ -1,5 +1,7 @@
 package org.uniexporter.exporter.adapter.faces;
 
+import org.uniexporter.exporter.adapter.annotations.AdvancementParameters;
+
 import java.lang.reflect.Field;
 
 public interface Self<T extends Self<T>> {
@@ -8,11 +10,17 @@ public interface Self<T extends Self<T>> {
         return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
-    default T advancementParameters(String name, Object value) throws Exception {
-        Field declaredField = this.getClass().getDeclaredField(name);
-        declaredField.setAccessible(true);
-        declaredField.set(this, value);
-        return (T) this;
+    default T advancementParameters(String name, Object value) {
+        try {
+            Field declaredField = this.getClass().getDeclaredField(name);
+            if (declaredField.isAnnotationPresent(AdvancementParameters.class)) {
+                if (declaredField.getAnnotation(AdvancementParameters.class).used()) {
+                    declaredField.setAccessible(true);
+                    declaredField.set(this, value);
+                }
+            }
+        } catch (Exception ignore) {}
+
+        return self();
     }
 }

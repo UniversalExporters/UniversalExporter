@@ -1,6 +1,11 @@
 package org.universal.exporter.forge;
 
+import com.mojang.brigadier.CommandDispatcher;
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.fluid.FlowableFluid;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.IModInfo;
@@ -11,6 +16,8 @@ import org.universal.exporter.platform.Mod;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 
 public class UniExporterExpectPlatformImpl {
@@ -40,5 +47,9 @@ public class UniExporterExpectPlatformImpl {
             list.add(new Mod(mod.getModId()));
         }
         return list;
+    }
+
+    public static void registryCommand(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment env) {
+
     }
 }

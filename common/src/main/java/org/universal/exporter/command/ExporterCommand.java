@@ -38,12 +38,10 @@ import org.universal.exporter.UniExporter;
 import org.universal.exporter.UniExporterExpectPlatform;
 import org.universal.exporter.command.argument.ExporterArgumentType;
 import org.universal.exporter.command.type.ExporterType;
-import org.universal.exporter.platform.Mod;
 import org.universal.exporter.utils.Base64Helper;
 import org.universal.exporter.utils.ItemAndBlockHelper;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,6 +63,8 @@ import static org.universal.exporter.utils.LanguageHelper.zh_cn;
  * @author QWERTY770
  */
 public class ExporterCommand {
+
+    public static final ExecutorService executorService = Executors.newWorkStealingPool();//线程池子
 
     /**
      * Register Server Command
@@ -98,47 +98,48 @@ public class ExporterCommand {
      * @param context execute context
      */
     public static void advancementsAll(CommandContext<ServerCommandSource> context) {
-        var mods = UniExporterExpectPlatform.getMods();
-
+        var modids = UniExporterExpectPlatform.getModids();
         MinecraftServer server = context.getSource().getServer();
 
         List<Advancement> advancements = server.getAdvancementLoader().getAdvancements().stream().toList();
-        ExecutorService executorService = Executors.newFixedThreadPool(mods.size());
-        CompletableFuture<?>[] futures = new CompletableFuture[mods.size()];
-        for (int i = 0; i < mods.size(); i++) {
-            Mod mod = mods.get(i);
-            Path advancementsJson = UniExporter.exporter.resolve(mod.modid).resolve("advancements.json");
 
-            futures[i] = CompletableFuture.runAsync(() -> {
+        for (int i = 0; i < modids.size(); i++) {
+            String modid = modids.get(i);
+            Path advancementsJson = UniExporter.exporter.resolve(modid).resolve("advancements.json");
+
+            CompletableFuture.runAsync(() -> {
                 List<Advancement> parents = advancements.stream().filter(advancement -> advancement.getParent() == null).toList();
                 Advancements modidAdvancements = new Advancements();
                 for (Advancement parent : parents) {
                     AdvancementDisplay display = parent.getDisplay();
-                    var title = display.getTitle().getContent();
-                    var description = display.getDescription().getContent();
+                    AdvancementSerializable advancement = new AdvancementSerializable();
+                    if (display != null) {
+                        var title = display.getTitle().getContent();
+                        var description = display.getDescription().getContent();
+
+                        AdvancementDisplayType displayType = new AdvancementDisplayType()
+                                .title(title instanceof TranslatableTextContent translatable ? zh_cn().get(translatable.getKey()) : title.toString())
+                                .englishTitle(title instanceof TranslatableTextContent translatable ? en_us().get(translatable.getKey()) : title.toString())
+                                .description(description instanceof TranslatableTextContent translatable ? zh_cn().get(translatable.getKey()) : title.toString())
+                                .englishDescription(description instanceof TranslatableTextContent translatable ? en_us().get(translatable.getKey()) : title.toString());
+                        advancement.display(displayType);
+                        try {
+                            Pair<String, String> pair = Base64Helper.itemStackToBase64(display.getIcon());
+                            displayType.icon(new IconType()
+                                    .smallIcon(pair.getLeft())
+                                    .largeIcon(pair.getRight()));
+                        } catch (IOException e) {
+                            UniExporter.LOGGER.error("don't find {}", display.getIcon().getItem().getName());
+                        }
+                        displayType
+                                .background(display.getBackground().toString())
+                                .frame(display.getFrame().getId())
+                                .showToast(display.shouldShowToast())
+                                .announceToChat(display.shouldAnnounceToChat())
+                                .hidden(display.isHidden());
+                    }
                     AdvancementRewards rewards = parent.getRewards();
                     CommandFunction.LazyContainer function = rewards.function;
-                    AdvancementDisplayType displayType = new AdvancementDisplayType()
-                            .title(title instanceof TranslatableTextContent translatable ? zh_cn().get(translatable.getKey()) : title.toString())
-                            .englishTitle(title instanceof TranslatableTextContent translatable ? en_us().get(translatable.getKey()) : title.toString())
-                            .description(description instanceof TranslatableTextContent translatable ? zh_cn().get(translatable.getKey()) : title.toString())
-                            .englishDescription(description instanceof TranslatableTextContent translatable ? en_us().get(translatable.getKey()) : title.toString());
-                    AdvancementSerializable advancement = new AdvancementSerializable()
-                            .display(displayType);
-                    try {
-                        Pair<String, String> pair = Base64Helper.itemStackToBase64(display.getIcon());
-                        displayType.icon(new IconType()
-                                .smallIcon(pair.getLeft())
-                                .largeIcon(pair.getRight()));
-                    } catch (IOException e) {
-                        UniExporter.LOGGER.error("don't find {}", display.getIcon().getItem().getName());
-                    }
-                    displayType
-                            .background(display.getBackground().toString())
-                            .frame(display.getFrame().getId())
-                            .showToast(display.shouldShowToast())
-                            .announceToChat(display.shouldAnnounceToChat())
-                            .hidden(display.isHidden());
 
                     advancement
                             .rewards(new AdvancementRewardsType()
@@ -146,10 +147,12 @@ public class ExporterCommand {
                                     );
                     advancement.rewards.loots = Arrays.stream(rewards.loot).map(Identifier::toString).collect(Collectors.toCollection(ArrayList::new));
                     advancement.rewards.recipes = Arrays.stream(rewards.getRecipes()).map(Identifier::toString).collect(Collectors.toCollection(ArrayList::new));
+                    Identifier id = function.getId();
+                    CommandFunctionType commandFunctionType = new CommandFunctionType();
+                    if (id != null) commandFunctionType.id(id.toString());
                     advancement.rewards
                             .function(new LazyContainerType()
-                                    .function(new CommandFunctionType()
-                                            .id(function.getId().toString())));
+                                    .function(commandFunctionType));
 
                     if (parent.text.getContent() instanceof TranslatableTextContent translatable){
                         advancement.englishName(en_us().get(translatable.getKey()));
@@ -172,7 +175,7 @@ public class ExporterCommand {
                         advancement.requirements(requirement);
                     advancement.sendsTelemetryEvent(parent.sendsTelemetryEvent());
 
-                    modidAdvancements.advancement(advancement);
+                    modidAdvancements.advancement(parent.getId().toString() ,advancement);
                 }
                 modidAdvancements.save(advancementsJson);
             });
@@ -184,23 +187,21 @@ public class ExporterCommand {
      * Exporting item and block
      * @param context execute context
      */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void itemAndBlockExporterAll(CommandContext<ServerCommandSource> context) {
 
         BlockAndItems blockAndItems = new BlockAndItems();
 
+        var modids = UniExporterExpectPlatform.getModids();
 
-        var mods = UniExporterExpectPlatform.getMods();
 
-        ExecutorService executorService = Executors.newFixedThreadPool(mods.size());
-        CompletableFuture<?>[] futures = new CompletableFuture[mods.size()];
-        for (int i = 0; i < mods.size(); i++) {
-            final Mod mod = mods.get(i);
+        CompletableFuture<?>[] futures = new CompletableFuture[modids.size()];
+
+        for (int i = 0; i < modids.size(); i++) {
+            final String modid = modids.get(i);
             futures[i] = CompletableFuture.runAsync(() -> {
                 BlockAndItemSerializable serializable = new BlockAndItemSerializable();
                 ItemAndBlockHelper itemAndBlockHelper = new ItemAndBlockHelper(serializable);
 
-                String modid = mod.modid;
                 Path itemAndBlocksJson = UniExporter.exporter.resolve(modid).resolve("item-and-block.json");
                 var registry = Registries.ITEM;
                 List<Identifier> registryIds = registry.getIds().stream().filter(identifier -> identifier.getNamespace().equals(modid)).toList();
@@ -273,22 +274,6 @@ public class ExporterCommand {
                 blockAndItems.save(itemAndBlocksJson);
             }, executorService);
         }
-        wait(futures);
-    }
-
-    /**
-     * Wait for {@link CompletableFuture}
-     * @param futures futures
-     */
-    public static void wait(CompletableFuture<?>[] futures) {
-        boolean done = true;
-        for (CompletableFuture<?> future : futures) {
-            if (!future.isDone()) {
-                done = false;
-                break;
-            }
-        }
-        if (!done) wait(futures);
     }
 
 

@@ -1,5 +1,6 @@
 package org.uniexporter.exporter.adapter.serializable.type;
 
+import org.uniexporter.exporter.adapter.annotations.AdvancementParameters;
 import org.uniexporter.exporter.adapter.faces.Self;
 
 import java.util.ArrayList;
@@ -12,13 +13,19 @@ public class ItemType implements Self<ItemType> {
     public BlockType asBlock;
     public String asFluid;
 
+    @AdvancementParameters(used = true)
+    public String rarity;
+
     public String type;
 
     public ItemType type(String type) {
         this.type = type;
-        return this;
+        return self();
     }
 
+    public ItemType rarity(String rarity) {
+        return advancementParameters("rarity", rarity);
+    }
 
     public ItemType OredictList(String oredictList) {
         if (OredictList == null) OredictList = new ArrayList<>();
