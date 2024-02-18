@@ -4,7 +4,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItems;
-import org.uniexporter.exporter.adapter.serializable.type.ItemType;
+import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ItemType;
 
 import java.util.function.Function;
 

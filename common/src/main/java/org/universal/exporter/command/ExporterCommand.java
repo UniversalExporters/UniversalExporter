@@ -16,10 +16,7 @@ import net.minecraft.block.FluidBlock;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.Item;
+import net.minecraft.item.*;
 import net.minecraft.registry.DefaultedRegistry;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
@@ -234,12 +231,11 @@ public class ExporterCommand implements Serializable {
         BlockAndItems blockAndItems = new BlockAndItems();
         Path itemAndBlocksJson = UniExporter.exporter.resolve(modid).resolve("item-and-block.json");
         CompletableFuture.runAsync(() -> {
-
-            BlockAndItemSerializable serializable = BlockAndItemSerializable.of(blockAndItem -> {
-                final DefaultedRegistry<Item> registry = Registries.ITEM;
-                List<Identifier> modItemIds = registry.getIds().stream().filter(identifier -> identifier.getNamespace().equals(modid)).toList();
-                for (Identifier modItemId : modItemIds) {
-                    Item item = registry.get(modItemId);
+            final DefaultedRegistry<Item> registry = Registries.ITEM;
+            List<Identifier> modItemIds = registry.getIds().stream().filter(identifier -> identifier.getNamespace().equals(modid)).toList();
+            for (Identifier modItemId : modItemIds) {
+                Item item = registry.get(modItemId);
+                BlockAndItemSerializable serializable = BlockAndItemSerializable.of(blockAndItem -> {
                     blockAndItem.type = ItemType.of(type -> {
                         type.maxStackSize = item.getMaxCount();
                         type.maxDurability = item.getMaxDamage();
@@ -248,24 +244,22 @@ public class ExporterCommand implements Serializable {
                             type.OredictList.add(itemTagKey.id().toString());
                             return itemTagKey;
                         });
+                        var base64Helper= new Base64Helper(blockAndItem.type);
+                        base64Helper.itemToBase(item);
+                        String translationKey = item.getTranslationKey();
+                        if (en_us().hasTranslation(translationKey))
+                            blockAndItem.englishName = en_us().get(translationKey);
+
+                        if (zh_cn().hasTranslation(translationKey))
+                            blockAndItem.name = zh_cn().get(item.getTranslationKey());
+                        if (item.isFood()) {
+                            FoodComponent foodComponent = item.getFoodComponent();
+                        }
                     });
-                }
-            });
-//            ItemAndBlockHelper itemAndBlockHelper = new ItemAndBlockHelper(serializable);
-//            var registry = Registries.ITEM;
-//            List<Identifier> registryIds = registry.getIds().stream().filter(identifier -> identifier.getNamespace().equals(modid)).toList();
-//            for (Identifier registryId : registryIds) {
-//
-//                Item item = registry.get(registryId);
-//                ItemType type = new ItemType()
-//                        .maxStackSize(item.getMaxCount())
-//                        .maxDurability(item.getMaxDamage());
-//                TagKey.codec(RegistryKeys.ITEM).map(itemTagKey -> {
-//                    if (item.getDefaultStack().itemMatches(itemRegistryEntry -> itemRegistryEntry.isIn(itemTagKey))) {
-//                        type.OredictList(itemTagKey.id().toString());
-//                    }
-//                    return itemTagKey;
-//                });
+                });
+
+            }
+
 //                AtomicBoolean b = new AtomicBoolean(true);
 //                itemAndBlockHelper
 //                        .init(item)

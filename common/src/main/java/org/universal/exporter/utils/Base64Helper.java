@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
 import org.uniexporter.exporter.adapter.serializable.type.IconType;
-import org.uniexporter.exporter.adapter.serializable.type.ItemType;
+import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ItemType;
 import org.universal.exporter.UniExporter;
 
 import java.io.IOException;
