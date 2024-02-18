@@ -6,7 +6,7 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import org.uniexporter.exporter.adapter.serializable.type.FluidType;
+import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.FluidType;
 import org.universal.exporter.platform.Mod;
 
 import java.nio.file.Path;

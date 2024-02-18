@@ -1,13 +1,21 @@
 package org.uniexporter.exporter.adapter.serializable;
 
 import org.uniexporter.exporter.adapter.faces.Self;
-import org.uniexporter.exporter.adapter.serializable.type.ItemType;
+import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ItemType;
+
+import java.util.function.Consumer;
 
 public class BlockAndItemSerializable implements Self<BlockAndItemSerializable> {
     public String name;
     public String englishName;
 
     public ItemType type;
+
+    public static BlockAndItemSerializable of(Consumer<BlockAndItemSerializable> consumer) {
+        BlockAndItemSerializable serializable = new BlockAndItemSerializable();
+        consumer.accept(serializable);
+        return serializable;
+    }
 
 
 

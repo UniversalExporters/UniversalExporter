@@ -10,7 +10,7 @@ public interface Self<T extends Self<T>> {
         return (T) this;
     }
 
-    default T advancementParameters(String name, Object value) {
+    default T advancementParameters(String name, Object value, boolean isUsed) {
         try {
             Field declaredField = this.getClass().getDeclaredField(name);
             if (declaredField.isAnnotationPresent(AdvancementParameters.class)) {

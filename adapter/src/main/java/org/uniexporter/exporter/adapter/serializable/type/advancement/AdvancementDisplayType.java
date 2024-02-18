@@ -32,8 +32,8 @@ public class AdvancementDisplayType implements Self<AdvancementDisplayType> {
         this.icon = icon;
         return self();
     }
-    public AdvancementDisplayType background(String background) {
-        return advancementParameters("background", background);
+    public AdvancementDisplayType background(String background, boolean isUsed) {
+        return advancementParameters("background", background, isUsed);
     }
     public AdvancementDisplayType frame(String frame) {
         this.frame = frame;

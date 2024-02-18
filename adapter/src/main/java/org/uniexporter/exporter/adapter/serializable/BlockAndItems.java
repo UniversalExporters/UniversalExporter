@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class BlockAndItems implements Save, Self<BlockAndItems> {
     public ConcurrentHashMap<String, BlockAndItemSerializable> items;
+    public ConcurrentHashMap<String, BlockAndItemSerializable> foods;
     public ConcurrentHashMap<String, BlockAndItemSerializable> armors;
     public ConcurrentHashMap<String, BlockAndItemSerializable> tools;
     public ConcurrentHashMap<String, BlockAndItemSerializable> blocks;

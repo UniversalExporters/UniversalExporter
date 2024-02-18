@@ -41,3 +41,51 @@
 
 ## 许可证
 本项目使用AGPLv3许可协议。
+
+## 命令
+/uex {select} ${modid} --advance-parameters
+
+### select
+- itemandblock
+- advancements
+
+
+## 导出格式申明 (用的json)
+
+### 物品和方块 
+```json5
+{
+  "items": {
+    "examplemod:testitem": {
+      "name": "测试物品",
+      "englishName": "testitem",
+      "type": {
+        "maxStackSize": 64,   //最大堆叠
+        "maxDurability": 0,  //最大耐久度
+        "OredictList": [      //矿词列表
+          "forge:iron"
+        ],
+        "icon": {
+          "smallIcon": "image?xxxx", // base64
+          "largeIcon": "image?xxxx" // base64
+        }
+      }
+    },
+    "examplemod:testitem1": {
+      "name": "测试物品1",
+      "englishName": "testitem1",
+      "type": {
+        "maxStackSize": 64,   //最大堆叠
+        "maxDurability": 0,  //最大耐久度
+        "OredictList": [      //矿词列表
+          "forge:iron"
+        ],
+        "icon": {
+          "smallIcon": "image?xxxx", // base64
+          "largeIcon": "image?xxxx" // base64
+        }
+      }
+    }
+  }
+}
+```

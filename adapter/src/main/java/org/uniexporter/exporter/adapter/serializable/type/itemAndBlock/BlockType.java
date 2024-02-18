@@ -1,4 +1,4 @@
-package org.uniexporter.exporter.adapter.serializable.type;
+package org.uniexporter.exporter.adapter.serializable.type.itemAndBlock;
 
 import org.uniexporter.exporter.adapter.faces.Self;
 

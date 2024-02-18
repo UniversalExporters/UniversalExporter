@@ -1,9 +1,11 @@
-package org.uniexporter.exporter.adapter.serializable.type;
+package org.uniexporter.exporter.adapter.serializable.type.itemAndBlock;
 
 import org.uniexporter.exporter.adapter.annotations.AdvancementParameters;
 import org.uniexporter.exporter.adapter.faces.Self;
+import org.uniexporter.exporter.adapter.serializable.type.IconType;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class ItemType implements Self<ItemType> {
     public Integer maxStackSize;
@@ -12,6 +14,12 @@ public class ItemType implements Self<ItemType> {
     public IconType icon;
     public BlockType asBlock;
     public String asFluid;
+
+    public static ItemType of(Consumer<ItemType> consumer) {
+        ItemType itemType = new ItemType();
+        consumer.accept(itemType);
+        return itemType;
+    }
 
     @AdvancementParameters(used = true)
     public String rarity;
@@ -23,8 +31,8 @@ public class ItemType implements Self<ItemType> {
         return self();
     }
 
-    public ItemType rarity(String rarity) {
-        return advancementParameters("rarity", rarity);
+    public ItemType rarity(String rarity, boolean isUsed) {
+        return advancementParameters("rarity", rarity, isUsed);
     }
 
     public ItemType OredictList(String oredictList) {

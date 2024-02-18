@@ -9,7 +9,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.IModInfo;
-import org.uniexporter.exporter.adapter.serializable.type.FluidType;
+import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.FluidType;
 import org.universal.exporter.UniExporterExpectPlatform;
 import org.universal.exporter.platform.Mod;
 

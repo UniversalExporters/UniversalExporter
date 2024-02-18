@@ -21,7 +21,7 @@ final def architecturyPlugin = libs.plugins.architectury.plugin.get().pluginId
 final def shadow = libs.plugins.shadow.get().pluginId
 def maven_group = libs.versions.maven.group.get()
 def archives_base_name = libs.versions.archives.base.name.get()
-def mod_version = libs.versions.mod.version.get()
+def mod_version = "${libs.versions.mod.version.get()}+mc${libs.versions.minecraft.get()}"
 
 
 subprojects {
@@ -43,9 +43,11 @@ subprojects {
         publications {
             create(project.name + "Maven", MavenPublication) {
                 artifactId = archives_base_name
-                from components.java
+
+                from(components.java as SoftwareComponent)
             }
         }
+
 
         // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
         repositories {
@@ -62,7 +64,7 @@ allprojects {
     }
 
     archivesBaseName = archives_base_name
-    version = "${mod_version}+mc${libs.versions.minecraft.get()}"
+    version = mod_version
 
     group = maven_group
 
@@ -115,16 +117,23 @@ forgix {
     mergedJarName = "${archives_base_name}-${rootProject.version}.jar"
     outputDir = "build/libs/forgix"
 
-    forge {
-        projectName = "forge"
-        jarLocation = "build/libs/${archives_base_name}-forge-${rootProject.version}.jar"
-    }
 
-    fabric {
-        projectName = "fabric"
-        jarLocation = "build/libs/${archives_base_name}-fabric-${rootProject.version}.jar"
-    }
+    forge(({
+        jarLocation = "build/libs/${archives_base_name}-${mod_version}.jar"
+    } as Closure<io.github.pacifistmc.forgix.plugin.ForgixMergeExtension.ForgeContainer>))
+
+
+    fabric(({
+        jarLocation = "build/libs/${archives_base_name}-${mod_version}.jar"
+    } as Closure<io.github.pacifistmc.forgix.plugin.ForgixMergeExtension.FabricContainer>))
 }
+
+tasks.build {
+    dependsOn(project(":fabric").tasks.build)
+    dependsOn(project(":forge").tasks.build)
+    dependsOn(tasks.mergeJars)
+}
+
 
 
 
