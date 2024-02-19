@@ -14,8 +14,12 @@ public class ItemType implements Self<ItemType> {
     public IconType icon;
     public BlockType asBlock;
     public String asFluid;
+    public Integer maxUseTime;
+    public FoodType asFood;
 
-    public static ItemType of(Consumer<ItemType> consumer) {
+    public NbtType nbt;
+
+    public static ItemType itemType(Consumer<ItemType> consumer) {
         ItemType itemType = new ItemType();
         consumer.accept(itemType);
         return itemType;

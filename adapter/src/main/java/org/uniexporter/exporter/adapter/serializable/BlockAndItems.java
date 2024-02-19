@@ -3,11 +3,8 @@ package org.uniexporter.exporter.adapter.serializable;
 import org.uniexporter.exporter.adapter.faces.Save;
 import org.uniexporter.exporter.adapter.faces.Self;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class BlockAndItems implements Save, Self<BlockAndItems> {
     public ConcurrentHashMap<String, BlockAndItemSerializable> items;
@@ -15,6 +12,7 @@ public class BlockAndItems implements Save, Self<BlockAndItems> {
     public ConcurrentHashMap<String, BlockAndItemSerializable> armors;
     public ConcurrentHashMap<String, BlockAndItemSerializable> tools;
     public ConcurrentHashMap<String, BlockAndItemSerializable> blocks;
+    public ConcurrentHashMap<String, BlockAndItemSerializable> fluids;
 
     public BlockAndItems item(String registryName, BlockAndItemSerializable item) {
         if (this.items == null) this.items = new ConcurrentHashMap<>();
@@ -36,5 +34,31 @@ public class BlockAndItems implements Save, Self<BlockAndItems> {
         blocks.put(registryName, block);
         return self();
     }
+
+    public BlockAndItemSerializable find(String registerName) {
+        for (Field declaredField : this.getClass().getDeclaredFields()) {
+            declaredField.setAccessible(true);
+            try {
+                //noinspection unchecked
+                ConcurrentHashMap<String, BlockAndItemSerializable> o = (ConcurrentHashMap<String, BlockAndItemSerializable>) declaredField.get(this);
+                if (o != null && o.containsKey(registerName))
+                    return o.get(registerName);
+
+            } catch (IllegalAccessException ignored) {
+            }
+        }
+        return null;
+
+    }
+
+//    @SafeVarargs
+//    public final BlockAndItemSerializable map(String registerName, ConcurrentHashMap<String, BlockAndItemSerializable>... maps) {
+//        for (ConcurrentHashMap<String, BlockAndItemSerializable> map : maps) {
+//            if (map != null && map.containsKey(registerName)) {
+//                return map.get(registerName);
+//            }
+//        }
+//        return null;
+//    }
 
 }

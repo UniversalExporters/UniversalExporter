@@ -11,7 +11,7 @@ public class BlockAndItemSerializable implements Self<BlockAndItemSerializable> 
 
     public ItemType type;
 
-    public static BlockAndItemSerializable of(Consumer<BlockAndItemSerializable> consumer) {
+    public static BlockAndItemSerializable blockAndItemSerializable(Consumer<BlockAndItemSerializable> consumer) {
         BlockAndItemSerializable serializable = new BlockAndItemSerializable();
         consumer.accept(serializable);
         return serializable;

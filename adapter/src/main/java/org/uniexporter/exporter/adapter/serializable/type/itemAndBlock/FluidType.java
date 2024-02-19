@@ -10,6 +10,7 @@ public class FluidType implements Self<FluidType> {
 
     public boolean isSource;
 
+
     public FluidType canSwim(boolean canSwim) {
         this.canSwim = canSwim;
         return self();

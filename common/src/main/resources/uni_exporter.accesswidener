@@ -5,3 +5,25 @@ accessible field net/minecraft/advancement/AdvancementRewards experience I
 accessible field net/minecraft/advancement/AdvancementRewards loot [Lnet/minecraft/util/Identifier;
 accessible field net/minecraft/advancement/AdvancementRewards function Lnet/minecraft/server/function/CommandFunction$LazyContainer;
 accessible field net/minecraft/advancement/Advancement text Lnet/minecraft/text/Text;
+accessible field net/minecraft/item/FoodComponent statusEffects Ljava/util/List;
+accessible field net/minecraft/entity/effect/StatusEffectInstance duration I
+accessible field net/minecraft/entity/effect/StatusEffectInstance amplifier I
+accessible field net/minecraft/entity/effect/StatusEffectInstance ambient Z
+accessible field net/minecraft/entity/effect/StatusEffectInstance showParticles Z
+accessible field net/minecraft/entity/effect/StatusEffectInstance showIcon Z
+accessible field net/minecraft/entity/effect/StatusEffectInstance hiddenEffect Lnet/minecraft/entity/effect/StatusEffectInstance;
+accessible field net/minecraft/entity/effect/StatusEffectInstance$FactorCalculationData paddingDuration I
+accessible field net/minecraft/entity/effect/StatusEffectInstance$FactorCalculationData factorStart F
+accessible field net/minecraft/entity/effect/StatusEffectInstance$FactorCalculationData factorTarget F
+accessible field net/minecraft/entity/effect/StatusEffectInstance$FactorCalculationData factorCurrent F
+accessible field net/minecraft/entity/effect/StatusEffectInstance$FactorCalculationData effectChangedTimestamp I
+accessible field net/minecraft/entity/effect/StatusEffectInstance$FactorCalculationData factorPreviousFrame F
+accessible field net/minecraft/entity/effect/StatusEffectInstance$FactorCalculationData hadEffectLastTick Z
+accessible field net/minecraft/entity/effect/StatusEffectInstance type Lnet/minecraft/entity/effect/StatusEffect;
+accessible field net/minecraft/block/AbstractBlock collidable Z
+accessible field net/minecraft/block/AbstractBlock randomTicks Z
+accessible field net/minecraft/item/MiningToolItem effectiveBlocks Lnet/minecraft/registry/tag/TagKey;
+
+
+
+

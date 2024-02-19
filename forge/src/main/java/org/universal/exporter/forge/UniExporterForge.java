@@ -15,6 +15,7 @@ import net.minecraftforge.registries.RegistryObject;
 import org.universal.exporter.UniExporter;
 import org.universal.exporter.command.ExporterCommand;
 import org.universal.exporter.command.argument.ExporterArgumentType;
+import org.universal.exporter.command.argument.ModidArgumentType;
 
 @Mod(UniExporter.MOD_ID)
 public class UniExporterForge {
@@ -22,7 +23,7 @@ public class UniExporterForge {
     public static final DeferredRegister<ArgumentSerializer<?, ?>> arguments = DeferredRegister.create(ForgeRegistries.COMMAND_ARGUMENT_TYPES, UniExporter.MOD_ID);
 
     public static final RegistryObject<ConstantArgumentSerializer<ExporterArgumentType>> exporter = arguments.register("exporter", () -> ArgumentTypes.registerByClass(ExporterArgumentType.class, ConstantArgumentSerializer.of(ExporterArgumentType::exporter)));
-
+    public static final RegistryObject<ConstantArgumentSerializer<ModidArgumentType>> modid = arguments.register("modid", () -> ArgumentTypes.registerByClass(ModidArgumentType.class, ConstantArgumentSerializer.of(ModidArgumentType::modids)));
     public UniExporterForge() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
