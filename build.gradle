@@ -8,10 +8,6 @@ plugins {
     alias libs.plugins.forgix
 }
 
-
-
-Path mavenDir = Path.of(System.getProperty("user.home")).resolve(".m2").resolve("repository").resolve(libs.versions.maven.group.get().replace(".", "/")).resolve("UniversalExporter-adaptor").resolve("0.1.0")
-
 architectury {
     minecraft = libs.versions.minecraft.get()
 }
@@ -90,28 +86,6 @@ allprojects {
     }
 }
 
-if (Files.exists(mavenDir)) {
-    project(":common") {
-        dependencies {
-            implementation(libs.adapter)
-        }
-    }
-    project(":fabric") {
-        dependencies {
-            implementation(libs.adapter)
-            include(libs.adapter)
-
-        }
-    }
-
-    project(":forge") {
-        dependencies {
-            minecraftClientLibraries(libs.adapter)
-            include(libs.adapter)
-        }
-    }
-}
-
 forgix {
     group = maven_group
     mergedJarName = "${archives_base_name}-${rootProject.version}.jar"
@@ -133,7 +107,6 @@ tasks.build {
     dependsOn(project(":forge").tasks.build)
     dependsOn(tasks.mergeJars)
 }
-
 
 
 

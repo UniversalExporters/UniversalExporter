@@ -21,6 +21,8 @@ dependencies {
     implementation(libs.gson)
     include(libs.gson)
 //    include(libs.adapter)
+    implementation("org.uniexporter.exporter:adapter")
+    include("org.uniexporter.exporter:adapter")
 }
 
 processResources {

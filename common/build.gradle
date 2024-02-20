@@ -7,5 +7,6 @@ dependencies {
     // Do NOT use other classes from fabric loader
     modImplementation libs.fabric.loader
     implementation(libs.gson)
+    implementation("org.uniexporter.exporter:adapter")
 
 }

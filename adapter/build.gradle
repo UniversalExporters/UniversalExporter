@@ -1,6 +1,3 @@
-import java.nio.file.Files
-import java.nio.file.Path
-
 plugins {
     id("java")
     id("maven-publish")
@@ -27,26 +24,4 @@ java {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
     options.release = 8
-}
-publishing {
-    publications {
-        mavenAdapter(MavenPublication) {
-            artifactId = "UniversalExporter-adaptor"
-
-            from components.java
-        }
-    }
-
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        mavenLocal()
-    }
-}
-
-Path mavenDir = Path.of(System.getProperty("user.home")).resolve(".m2").resolve("repository").resolve(libs.versions.maven.group.get().replace(".", "/")).resolve("UniversalExporter-adaptor").resolve("0.1.0")
-
-if (!Files.exists(mavenDir)) {
-    tasks.withType(PublishToMavenLocal).configureEach {
-        it.publish()
-    }
 }
