@@ -1,10 +1,7 @@
 package org.universal.exporter.utils;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.text.TextVisitFactory;
+import net.minecraft.text.*;
 import net.minecraft.util.Language;
 import org.uniexporter.exporter.adapter.serializable.type.NameType;
 
@@ -40,6 +37,13 @@ public class LanguageHelper extends Language {
             type.englishName = en_us().get(translationKey);
         if (zh_cn().hasTranslation(translationKey))
             type.name = zh_cn().get(translationKey);
+    }
+
+    public static String get(TextContent content, LanguageHelper helper) {
+        if (content instanceof TranslatableTextContent ctx && helper.hasTranslation(ctx.getKey())) {
+            return helper.get(ctx.getKey());
+        }
+        return content.toString();
     }
 
 

@@ -10,6 +10,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import org.jetbrains.annotations.NotNull;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
@@ -31,16 +32,16 @@ import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.Nb
 import static org.uniexporter.exporter.adapter.serializable.type.status.FactorCalculationDataType.factorCalculationDataType;
 import static org.uniexporter.exporter.adapter.serializable.type.status.StatusEffectInstanceType.statusEffectInstanceType;
 import static org.uniexporter.exporter.adapter.serializable.type.status.StatusEffectType.statusEffectType;
+import static org.universal.exporter.utils.Base64Helper.icon;
 import static org.universal.exporter.utils.LanguageHelper.en_us;
 import static org.universal.exporter.utils.LanguageHelper.zh_cn;
 
 @SuppressWarnings("UnusedReturnValue")
 public class ItemAndBlockHelper extends DefaultHelper<ItemAndBlockHelper> {
-    private final String registerName;
-    private final boolean this$advanceParameters;
+
+
     public ItemAndBlockHelper(String registerName, boolean this$advanceParameters) {
-        this.registerName = registerName;
-        this.this$advanceParameters = this$advanceParameters;
+        super(registerName, this$advanceParameters);
     }
 
     @Override
@@ -60,6 +61,26 @@ public class ItemAndBlockHelper extends DefaultHelper<ItemAndBlockHelper> {
         return self();
     }
 
+    public ItemAndBlockHelper defaultSetItemSettings(ItemStack stack, ItemType type) {
+        type.maxStackSize = stack.getItem().getMaxCount();
+        type.maxDurability = stack.getItem().getMaxDamage();
+        TagKey.codec(RegistryKeys.ITEM).map(itemTagKey -> findAllOredicts(type, itemTagKey));
+        type.icon(icon().itemStackToBase(stack));
+        return self();
+    }
+
+    @NotNull
+    public ItemType save(ItemStack stack, BlockAndItems blockAndItems, BlockAndItemSerializable blockAndItem) {
+        return ItemType.itemType(type -> {
+            defaultSetItemSettings(stack, type)
+                    .language(blockAndItem, stack) // LanguageHelper.get
+                    .checkAndSaveInFood(stack, blockAndItems, blockAndItem, type) // stack.getItem().isFood()
+                    .blockSettings(blockAndItems, blockAndItem, type, stack) // instanceof BlockItem block instanceof FluidBlock else other
+                    .setHasNbt(type, stack.getNbt()); // nbtCompound != null
+
+        });
+    }
+
     @SuppressWarnings("deprecation")
     public ItemAndBlockHelper advanceParameterBlockType(BlockType blockType, BlockState defaultState, Block block) {
         if (this$advanceParameters) {
@@ -68,7 +89,6 @@ public class ItemAndBlockHelper extends DefaultHelper<ItemAndBlockHelper> {
             blockType.isAir = defaultState.isAir();
             blockType.liquid = defaultState.isLiquid();
             blockType.solid = defaultState.isSolid();
-            blockType.ticksRandomly = defaultState.hasRandomTicks();
             blockType.randomTicks = block.randomTicks;
         }
         return self();
@@ -93,8 +113,8 @@ public class ItemAndBlockHelper extends DefaultHelper<ItemAndBlockHelper> {
         return self();
     }
 
-    public ItemAndBlockHelper blockSettings(BlockAndItems blockAndItems, BlockAndItemSerializable blockAndItem, ItemType type, Item item, ItemAndBlockHelper helper) {
-        if (item instanceof BlockItem blockItem) {
+    public ItemAndBlockHelper blockSettings(BlockAndItems blockAndItems, BlockAndItemSerializable blockAndItem, ItemType type, ItemStack stack) {
+        if (stack.getItem() instanceof BlockItem blockItem) {
 
             Block block = blockItem.getBlock();
             BlockState defaultState = block.getDefaultState();

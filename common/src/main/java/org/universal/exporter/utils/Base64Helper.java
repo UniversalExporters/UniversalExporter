@@ -10,24 +10,32 @@ import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ItemType;
 import org.universal.exporter.UniExporter;
 
 import java.io.IOException;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Base64;
 
-public class Base64Helper {
-    private final ItemType serializable;
+public class Base64Helper implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -1242605576574999681L;
+    private final IconType type;
 
-    public Base64Helper(ItemType serializable) {
-        this.serializable = serializable;
+    public Base64Helper(IconType type) {
+        this.type = type;
+    }
+
+    public static Base64Helper icon() {
+        return new Base64Helper(new IconType());
     }
 
     public void itemToBase(Item item) {
         itemStackToBase(item.getDefaultStack());
     }
 
-    public void itemStackToBase(ItemStack stack) {
+    public IconType itemStackToBase(ItemStack stack) {
         Pair<String, String> pair = itemStackToBase64(stack);
-        serializable.icon(new IconType()
-                .smallIcon(pair.getLeft())
-                .largeIcon(pair.getRight()));
+        type.smallIcon = pair.getLeft();
+        type.largeIcon = pair.getRight();
+        return type;
     }
 
     public static Pair<String, String> itemStackToBase64(ItemStack stack) {

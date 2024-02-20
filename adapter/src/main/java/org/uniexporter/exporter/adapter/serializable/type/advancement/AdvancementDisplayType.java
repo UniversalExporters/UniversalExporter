@@ -4,6 +4,8 @@ import org.uniexporter.exporter.adapter.annotations.AdvancementParameters;
 import org.uniexporter.exporter.adapter.faces.Self;
 import org.uniexporter.exporter.adapter.serializable.type.IconType;
 
+import java.util.function.Consumer;
+
 public class AdvancementDisplayType implements Self<AdvancementDisplayType> {
     public String title;
     public String englishTitle;
@@ -19,6 +21,12 @@ public class AdvancementDisplayType implements Self<AdvancementDisplayType> {
     public boolean hidden;
     public float x;
     public float y;
+
+    public static AdvancementDisplayType advancementDisplayType(Consumer<AdvancementDisplayType> consumer) {
+        AdvancementDisplayType displayType = new AdvancementDisplayType();
+        consumer.accept(displayType);
+        return displayType;
+    }
 
     public AdvancementDisplayType title(String title) {
         this.title = title;

@@ -36,7 +36,6 @@ public class BlockType implements Self<BlockType> {
 
 //    protected ShapeCache shapeCache; //block state
 //    public FluidState fluidState; //block state
-    public boolean ticksRandomly; //block state
 
     public float resistance; // block settings
     public boolean collidable;  // block settings
