@@ -18,4 +18,9 @@ public class FoodType {
         consumer.accept(foodType);
         return foodType;
     }
+
+    public void statusEffects(StatusEffectInstanceType type, Float f) {
+        if (this.statusEffects == null) this.statusEffects = new ConcurrentHashMap<>();
+        statusEffects.put(type, f);
+    }
 }

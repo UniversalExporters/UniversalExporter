@@ -35,6 +35,12 @@ public class BlockAndItems implements Save, Self<BlockAndItems> {
         return self();
     }
 
+    public BlockAndItems food(String registryName, BlockAndItemSerializable food) {
+        if (this.foods == null) foods = new ConcurrentHashMap<>();
+        foods.put(registryName, food);
+        return self();
+    }
+
     public BlockAndItemSerializable find(String registerName) {
         for (Field declaredField : this.getClass().getDeclaredFields()) {
             declaredField.setAccessible(true);

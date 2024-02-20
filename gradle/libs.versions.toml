@@ -5,6 +5,7 @@
 maven-group = "org.uniexporter.exporter"
 archives-base-name = "UniversalExporter"
 mod-version = "0.1.0"
+jb-anno="24.1.0"
 
 # platform settings
 architectury_loom = "1.5-SNAPSHOT"
@@ -30,6 +31,7 @@ gson = "2.10.1"
 adapter = "0.1.0"
 
 [libraries]
+jb-anno = { module="org.jetbrains:annotations", version.ref="jb-anno" }
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
 yarn_mappings = { module = "net.fabricmc:yarn", version.ref = "yarn_mappings" }
 architectury_api = { module = "dev.architectury:architectury", version.ref = "architectury_api" }

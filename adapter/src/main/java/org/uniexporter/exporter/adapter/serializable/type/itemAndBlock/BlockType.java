@@ -1,5 +1,6 @@
 package org.uniexporter.exporter.adapter.serializable.type.itemAndBlock;
 
+import org.uniexporter.exporter.adapter.annotations.AdvancementParameters;
 import org.uniexporter.exporter.adapter.faces.Self;
 
 import java.util.Optional;

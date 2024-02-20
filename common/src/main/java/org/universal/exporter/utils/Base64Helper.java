@@ -24,29 +24,26 @@ public class Base64Helper {
     }
 
     public void itemStackToBase(ItemStack stack) {
+        Pair<String, String> pair = itemStackToBase64(stack);
+        serializable.icon(new IconType()
+                .smallIcon(pair.getLeft())
+                .largeIcon(pair.getRight()));
+    }
 
-        try {
-            Pair<String, String> pair = itemStackToBase64(stack);
-            serializable.icon(new IconType()
-                    .smallIcon(pair.getLeft())
-                    .largeIcon(pair.getRight()));
+    public static Pair<String, String> itemStackToBase64(ItemStack stack) {
+        Pair<FrameHelper, FrameHelper> pair = FrameHelper.of(stack);
+        String smallBase64, largeBase64;
+        try(
+                NativeImage nativeImage = pair.getLeft().dumpFrom();
+                NativeImage nativeImage1 = pair.getRight().dumpFrom();
+        ) {
+            smallBase64 = Base64.getEncoder().encodeToString(nativeImage.getBytes());
+            largeBase64 = Base64.getEncoder().encodeToString(nativeImage1.getBytes());
+            return new Pair<>(smallBase64, largeBase64);
         } catch (IOException e) {
             UniExporter.LOGGER.error("don't find {}", stack.getItem().getName());
         }
-
-    }
-
-    public static Pair<String, String> itemStackToBase64(ItemStack stack) throws IOException {
-        Pair<FrameHelper, FrameHelper> pair = FrameHelper.of(stack);
-        String smallBase64, largeBase64;
-        try(NativeImage nativeImage = pair.getLeft().dumpFrom()) {
-            smallBase64 = Base64.getEncoder().encodeToString(nativeImage.getBytes());
-        }
-        try(NativeImage nativeImage = pair.getRight().dumpFrom()) {
-            largeBase64 = Base64.getEncoder().encodeToString(nativeImage.getBytes());
-        }
-
-        return new Pair<>(smallBase64, largeBase64);
+        return new Pair<>(null, null);
     }
 
 }

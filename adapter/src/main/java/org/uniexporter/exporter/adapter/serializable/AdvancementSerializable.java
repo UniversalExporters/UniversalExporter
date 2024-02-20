@@ -1,6 +1,7 @@
 package org.uniexporter.exporter.adapter.serializable;
 
 import org.uniexporter.exporter.adapter.faces.Self;
+import org.uniexporter.exporter.adapter.serializable.type.NameType;
 import org.uniexporter.exporter.adapter.serializable.type.advancement.AdvancementCriterionType;
 import org.uniexporter.exporter.adapter.serializable.type.advancement.AdvancementDisplayType;
 import org.uniexporter.exporter.adapter.serializable.type.advancement.AdvancementRewardsType;
@@ -10,13 +11,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AdvancementSerializable implements Self<AdvancementSerializable> {
+public class AdvancementSerializable extends NameType implements Self<AdvancementSerializable> {
     public ArrayList<AdvancementSerializable> children;
     public AdvancementDisplayType display;
     public AdvancementRewardsType rewards;
-
-    public String name;
-    public String englishName;
 
 
     public Map<String, AdvancementCriterionType> criteria;

@@ -6,6 +6,7 @@ import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.TextVisitFactory;
 import net.minecraft.util.Language;
+import org.uniexporter.exporter.adapter.serializable.type.NameType;
 
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +33,13 @@ public class LanguageHelper extends Language {
     public static LanguageHelper zh_cn() {
         if (zh_cn == null) zh_cn = new LanguageHelper("zh_cn");
         return zh_cn;
+    }
+
+    public static void get(NameType type, String translationKey) {
+        if (en_us().hasTranslation(translationKey))
+            type.englishName = en_us().get(translationKey);
+        if (zh_cn().hasTranslation(translationKey))
+            type.name = zh_cn().get(translationKey);
     }
 
 

@@ -14,6 +14,7 @@ version = "0.1.0"
 
 dependencies {
     implementation(libs.gson)
+    implementation(libs.jb.anno)
 }
 
 java {

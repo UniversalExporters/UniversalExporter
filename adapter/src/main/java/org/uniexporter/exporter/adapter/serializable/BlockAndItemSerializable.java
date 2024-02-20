@@ -1,13 +1,12 @@
 package org.uniexporter.exporter.adapter.serializable;
 
 import org.uniexporter.exporter.adapter.faces.Self;
+import org.uniexporter.exporter.adapter.serializable.type.NameType;
 import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ItemType;
 
 import java.util.function.Consumer;
 
-public class BlockAndItemSerializable implements Self<BlockAndItemSerializable> {
-    public String name;
-    public String englishName;
+public class BlockAndItemSerializable extends NameType implements Self<BlockAndItemSerializable> {
 
     public ItemType type;
 
