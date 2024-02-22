@@ -18,10 +18,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.util.Pair;
 import org.joml.Matrix4f;
+import org.uniexporter.exporter.adapter.utils.IFrameHelper;
 
 import java.util.Base64;
 
-public class FrameHelper {
+public class FrameHelper implements IFrameHelper<NativeImage, ItemStack, BakedModel, ItemRenderer> {
     private final Framebuffer fbo;
     private MatrixStack matrixStack;
     private static final int lightSet = 15728880;
@@ -39,7 +40,8 @@ public class FrameHelper {
         return new Pair<>(new FrameHelper(32, stack), new FrameHelper(128, stack));
     }
 
-    private void begin() {
+    @Override
+    public void begin() {
         this.matrixStack = RenderSystem.getModelViewStack();
         this.matrixStack.push();
         this.matrixStack.loadIdentity();
@@ -50,13 +52,14 @@ public class FrameHelper {
         this.fbo.beginRead();
     }
 
-    private void end() {
+    @Override
+    public void end() {
         RenderSystem.restoreProjectionMatrix();
         this.matrixStack.pop();
         this.fbo.endWrite();
         this.fbo.endRead();
     }
-
+    @Override
     public void render(ItemStack stack, int x, int y, BakedModel baked, ItemRenderer renderer) {
         RenderSystem.setShaderTexture(0, PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
         RenderSystem.enableBlend();
@@ -83,7 +86,8 @@ public class FrameHelper {
 
     }
 
-    private static String base64(NativeImage image) {
+    @Override
+    public String base64(NativeImage image) {
         String encode;
         try {
             try {
@@ -104,6 +108,7 @@ public class FrameHelper {
         }
     }
 
+    @Override
     public NativeImage dumpFrom() {
         NativeImage img = new NativeImage(fbo.textureWidth, fbo.textureHeight, false);
         RenderSystem.bindTexture(fbo.getColorAttachment());
