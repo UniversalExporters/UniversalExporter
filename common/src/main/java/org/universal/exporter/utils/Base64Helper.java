@@ -7,6 +7,7 @@ import net.minecraft.util.Pair;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
 import org.uniexporter.exporter.adapter.serializable.type.IconType;
 import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ItemType;
+import org.uniexporter.exporter.adapter.utils.IBase64Helper;
 import org.universal.exporter.UniExporter;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Base64;
 
-public class Base64Helper implements Serializable {
+public class Base64Helper implements Serializable, IBase64Helper<Item, ItemStack, Pair<String, String>> {
     @Serial
     private static final long serialVersionUID = -1242605576574999681L;
     private final IconType type;
@@ -27,10 +28,11 @@ public class Base64Helper implements Serializable {
         return new Base64Helper(new IconType());
     }
 
+    @Override
     public void itemToBase(Item item) {
         itemStackToBase(item.getDefaultStack());
     }
-
+    @Override
     public IconType itemStackToBase(ItemStack stack) {
         Pair<String, String> pair = itemStackToBase64(stack);
         type.smallIcon = pair.getLeft();
@@ -38,7 +40,7 @@ public class Base64Helper implements Serializable {
         return type;
     }
 
-    public static Pair<String, String> itemStackToBase64(ItemStack stack) {
+    public Pair<String, String> itemStackToBase64(ItemStack stack) {
         Pair<FrameHelper, FrameHelper> pair = FrameHelper.of(stack);
         String smallBase64, largeBase64;
         try(

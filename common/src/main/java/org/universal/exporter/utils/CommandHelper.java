@@ -2,12 +2,14 @@ package org.universal.exporter.utils;
 
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.ServerCommandSource;
+import org.uniexporter.exporter.adapter.utils.ICommandHelper;
 import org.universal.exporter.command.type.ModidType;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.function.Consumer;
 
-public class CommandHelper {
+public class CommandHelper implements ICommandHelper<ModidType> {
     protected final ModidType this$modid;
 
     protected final CommandContext<ServerCommandSource> context;
@@ -17,11 +19,13 @@ public class CommandHelper {
         this.context = context;
     }
 
-    public void generationAll(Consumer<String> consumer) {
-        if (this$modid != null)
-            consumer.accept(this$modid.name());
-        else
-            Arrays.stream(ModidType.values()).map(ModidType::name).forEach(consumer);
+    @Override
+    public ModidType modid() {
+        return this$modid;
+    }
 
+    @Override
+    public ModidType[] names() {
+        return ModidType.values();
     }
 }
