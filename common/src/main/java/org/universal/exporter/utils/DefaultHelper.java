@@ -3,6 +3,9 @@ package org.universal.exporter.utils;
 import net.minecraft.item.ItemStack;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
 
+import static org.universal.exporter.utils.LanguageHelper.en_us;
+import static org.universal.exporter.utils.LanguageHelper.zh_cn;
+
 public abstract class DefaultHelper<T extends DefaultHelper<T>> {
 
     protected final String registerName;
@@ -13,7 +16,8 @@ public abstract class DefaultHelper<T extends DefaultHelper<T>> {
     }
 
     public T language(BlockAndItemSerializable blockAndItem, ItemStack item) {
-        LanguageHelper.get(blockAndItem, item.getTranslationKey());
+        en_us().get(blockAndItem, item.getTranslationKey());
+        zh_cn().get(blockAndItem, item.getTranslationKey());
         return self();
     }
 

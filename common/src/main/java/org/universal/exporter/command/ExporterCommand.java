@@ -39,7 +39,6 @@ import org.universal.exporter.command.type.ExporterType;
 import org.universal.exporter.command.type.ModidType;
 import org.universal.exporter.utils.CommandHelper;
 import org.universal.exporter.utils.ItemAndBlockHelper;
-import org.universal.exporter.utils.LanguageHelper;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -81,8 +80,14 @@ public class ExporterCommand extends CommandHelper implements Serializable {
 
     private ExporterCommand(CommandContext<ServerCommandSource> context, ExporterType select, ModidType modid, boolean advanceParameters) {
         super(modid, context);
+        initType();
         this$select = select;
         this$advanceParameters = advanceParameters;
+    }
+
+    public void initType() {
+        ExporterType.itemandblock.setRunnable(this::itemAndBlockExporterAll);
+        ExporterType.advancements.setRunnable(this::advancementsAll);
     }
 
     /**
@@ -144,42 +149,39 @@ public class ExporterCommand extends CommandHelper implements Serializable {
             itemAndBlockExporterAll();
             advancementsAll();
         } else {
-            if (this$select.equals(ExporterType.itemandblock)) {
-                itemAndBlockExporterAll();
-            } else if (this$select.equals(ExporterType.advancements)) {
-                advancementsAll();
-            }
+            CompletableFuture.runAsync(this$select.runnable, executorService);
         }
 
         return defaultCommandSources();
     }
 
 
-
+    @SuppressWarnings("unchecked")
     public void advancementModId(String modid) {
         Path advancementsJson = UniExporter.exporter.resolve(modid).resolve("advancements.json");
         List<Advancement> advancements = context.getSource().getServer().getAdvancementLoader().getAdvancements().stream().toList();
+
         CompletableFuture.runAsync(() -> {
             List<Advancement> parents = advancements.stream().filter(advancement -> advancement.getParent() == null).toList();
             Advancements modidAdvancements = new Advancements();
             for (Advancement parent : parents) {
                 String registerName = parent.getId().toString();
                 AdvancementSerializable advancement = new AdvancementSerializable();
-                Optional.ofNullable(parent.getDisplay()).ifPresent(display -> {
-                    advancement.display = advancementDisplayType(advancementDisplay -> {
-                        advancementDisplay.title = LanguageHelper.get(display.getTitle().getContent(), zh_cn());
-                        advancementDisplay.englishTitle = LanguageHelper.get(display.getTitle().getContent(), en_us());
-                        advancementDisplay.description = LanguageHelper.get(display.getDescription().getContent(), zh_cn());
-                        advancementDisplay.englishDescription = LanguageHelper.get(display.getDescription().getContent(), en_us());
-                        advancementDisplay.icon(icon().itemStackToBase(display.getIcon()));
-                        if (display.getBackground() != null) {
-                            advancementDisplay.background(display.getBackground().toString(), this$advanceParameters);
-                        }
-                        advancementDisplay.frame = display.getFrame().getId();
-                        advancementDisplay.showToast = display.shouldShowToast();
-                        advancementDisplay.announceToChat = display.shouldAnnounceToChat();
-                        advancementDisplay.hidden = display.isHidden();
-                    });
+                var display = parent.getDisplay();
+
+                if (display != null) advancement.display = advancementDisplayType(advancementDisplay -> {
+                    advancementDisplay.title = zh_cn().get(display.getTitle().getContent());
+                    advancementDisplay.englishTitle = en_us().get(display.getTitle().getContent());
+                    advancementDisplay.description = zh_cn().get(display.getDescription().getContent());
+                    advancementDisplay.englishDescription = en_us().get(display.getDescription().getContent());
+                    advancementDisplay.icon(icon().itemStackToBase(display.getIcon()));
+                    if (display.getBackground() != null) {
+                        advancementDisplay.background(display.getBackground().toString(), this$advanceParameters);
+                    }
+                    advancementDisplay.frame = display.getFrame().getId();
+                    advancementDisplay.showToast = display.shouldShowToast();
+                    advancementDisplay.announceToChat = display.shouldAnnounceToChat();
+                    advancementDisplay.hidden = display.isHidden();
                 });
                 AdvancementRewards rewards = parent.getRewards();
                 CommandFunction.LazyContainer function = rewards.function;

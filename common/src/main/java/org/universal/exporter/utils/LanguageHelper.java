@@ -4,17 +4,18 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.text.*;
 import net.minecraft.util.Language;
 import org.uniexporter.exporter.adapter.serializable.type.NameType;
+import org.uniexporter.exporter.adapter.utils.ILanguageHelper;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-public class LanguageHelper extends Language {
+@SuppressWarnings("unchecked")
+public class LanguageHelper extends Language implements ILanguageHelper<TextContent> {
 
 
     final Map<String, String> map;
-    static LanguageHelper en_us, zh_cn;
     protected LanguageHelper(String language) {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         Objects.requireNonNull(builder);
@@ -23,29 +24,18 @@ public class LanguageHelper extends Language {
         map = builder.build();
     }
 
-    public static LanguageHelper en_us() {
-        if (en_us == null) en_us = new LanguageHelper("en_us");
-        return en_us;
-    }
-    public static LanguageHelper zh_cn() {
-        if (zh_cn == null) zh_cn = new LanguageHelper("zh_cn");
-        return zh_cn;
+
+    public static ILanguageHelper<TextContent> en_us() {
+        ILanguageHelper<?> en = en_us.get();
+        if (en == null) en_us.set(new LanguageHelper("en_us"));
+        return (ILanguageHelper<TextContent>) en_us.get();
     }
 
-    public static void get(NameType type, String translationKey) {
-        if (en_us().hasTranslation(translationKey))
-            type.englishName = en_us().get(translationKey);
-        if (zh_cn().hasTranslation(translationKey))
-            type.name = zh_cn().get(translationKey);
+    public static ILanguageHelper<TextContent> zh_cn() {
+        ILanguageHelper<?> zh = zh_cn.get();
+        if (zh == null) zh_cn.set(new LanguageHelper("zh_cn"));
+        return (ILanguageHelper<TextContent>) zh_cn.get();
     }
-
-    public static String get(TextContent content, LanguageHelper helper) {
-        if (content instanceof TranslatableTextContent ctx && helper.hasTranslation(ctx.getKey())) {
-            return helper.get(ctx.getKey());
-        }
-        return content.toString();
-    }
-
 
     @Override
     public String get(String key, String fallback) {
@@ -53,8 +43,18 @@ public class LanguageHelper extends Language {
     }
 
     @Override
+    public Map<String, String> map() {
+        return map;
+    }
+
+    @Override
     public boolean hasTranslation(String key) {
-        return  map.containsKey(key);
+        return  map().containsKey(key);
+    }
+
+    @Override
+    public String get(TextContent ctx) {
+        return null;
     }
 
     @Override
