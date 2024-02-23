@@ -14,6 +14,12 @@ public class BlockAndItems implements Save, Self<BlockAndItems> {
     public ConcurrentHashMap<String, BlockAndItemSerializable> blocks;
     public ConcurrentHashMap<String, BlockAndItemSerializable> fluids;
 
+    public BlockAndItems fluid(String registerName, BlockAndItemSerializable fluid) {
+        if (this.fluids == null) this.fluids = new ConcurrentHashMap<>();
+        this.fluids.put(registerName, fluid);
+        return self();
+    }
+
     public BlockAndItems item(String registryName, BlockAndItemSerializable item) {
         if (this.items == null) this.items = new ConcurrentHashMap<>();
         items.put(registryName, item);

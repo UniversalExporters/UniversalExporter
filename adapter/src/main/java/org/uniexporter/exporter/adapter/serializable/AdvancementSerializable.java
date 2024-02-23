@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class AdvancementSerializable extends NameType implements Self<AdvancementSerializable> {
     public ArrayList<AdvancementSerializable> children;
@@ -21,6 +22,12 @@ public class AdvancementSerializable extends NameType implements Self<Advancemen
     public ArrayList<ArrayList<String>> requirements;
 
     public boolean sendsTelemetryEvent;
+
+    public static AdvancementSerializable advancement(Consumer<AdvancementSerializable> consumer) {
+        AdvancementSerializable advancementSerializable = new AdvancementSerializable();
+        consumer.accept(advancementSerializable);
+        return advancementSerializable;
+    }
 
     public AdvancementSerializable sendsTelemetryEvent(boolean sendsTelemetryEvent) {
         this.sendsTelemetryEvent = sendsTelemetryEvent;

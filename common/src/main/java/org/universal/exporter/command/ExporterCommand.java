@@ -33,10 +33,12 @@ import org.uniexporter.exporter.adapter.serializable.type.advancement.CommandFun
 import org.uniexporter.exporter.adapter.serializable.type.advancement.LazyContainerType;
 import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ItemType;
 import org.universal.exporter.UniExporter;
+import org.universal.exporter.UniExporterExpectPlatform;
 import org.universal.exporter.command.argument.ExporterArgumentType;
 import org.universal.exporter.command.argument.ModidArgumentType;
 import org.universal.exporter.command.type.ExporterType;
 import org.universal.exporter.command.type.ModidType;
+import org.universal.exporter.utils.AdvancementHelper;
 import org.universal.exporter.utils.CommandHelper;
 import org.universal.exporter.utils.ItemAndBlockHelper;
 
@@ -53,6 +55,7 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 import static org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable.blockAndItemSerializable;
 import static org.uniexporter.exporter.adapter.serializable.type.advancement.AdvancementDisplayType.advancementDisplayType;
+import static org.uniexporter.exporter.adapter.serializable.type.advancement.AdvancementRewardsType.advancementRewardsType;
 import static org.universal.exporter.command.argument.ExporterArgumentType.getExporter;
 import static org.universal.exporter.command.argument.ModidArgumentType.getModidType;
 import static org.universal.exporter.utils.Base64Helper.icon;
@@ -77,6 +80,7 @@ public class ExporterCommand extends CommandHelper implements Serializable {
 
     private final ExporterType this$select;
     private final Boolean this$advanceParameters;
+    private static final Path exporter = UniExporterExpectPlatform.getGameFolder().resolve("exporter");
 
     private ExporterCommand(CommandContext<ServerCommandSource> context, ExporterType select, ModidType modid, boolean advanceParameters) {
         super(modid, context);
@@ -86,8 +90,8 @@ public class ExporterCommand extends CommandHelper implements Serializable {
     }
 
     public void initType() {
-        ExporterType.itemandblock.setRunnable(this::itemAndBlockExporterAll);
-        ExporterType.advancements.setRunnable(this::advancementsAll);
+        ExporterType.itemandblock.setRunnable(() -> itemAndBlockExporterAll());
+        ExporterType.advancements.setRunnable(() -> advancementsAll());
     }
 
     /**
@@ -165,66 +169,7 @@ public class ExporterCommand extends CommandHelper implements Serializable {
             List<Advancement> parents = advancements.stream().filter(advancement -> advancement.getParent() == null).toList();
             Advancements modidAdvancements = new Advancements();
             for (Advancement parent : parents) {
-                String registerName = parent.getId().toString();
-                AdvancementSerializable advancement = new AdvancementSerializable();
-                var display = parent.getDisplay();
-
-                if (display != null) advancement.display = advancementDisplayType(advancementDisplay -> {
-                    advancementDisplay.title = zh_cn().get(display.getTitle().getContent());
-                    advancementDisplay.englishTitle = en_us().get(display.getTitle().getContent());
-                    advancementDisplay.description = zh_cn().get(display.getDescription().getContent());
-                    advancementDisplay.englishDescription = en_us().get(display.getDescription().getContent());
-                    advancementDisplay.icon(icon().itemStackToBase(display.getIcon()));
-                    if (display.getBackground() != null) {
-                        advancementDisplay.background(display.getBackground().toString(), this$advanceParameters);
-                    }
-                    advancementDisplay.frame = display.getFrame().getId();
-                    advancementDisplay.showToast = display.shouldShowToast();
-                    advancementDisplay.announceToChat = display.shouldAnnounceToChat();
-                    advancementDisplay.hidden = display.isHidden();
-                });
-                AdvancementRewards rewards = parent.getRewards();
-                CommandFunction.LazyContainer function = rewards.function;
-
-                advancement
-                        .rewards(new AdvancementRewardsType()
-                                .experience(rewards.experience)
-                        );
-                advancement.rewards.loots = Arrays.stream(rewards.loot).map(Identifier::toString).collect(Collectors.toCollection(ArrayList::new));
-                advancement.rewards.recipes = Arrays.stream(rewards.getRecipes()).map(Identifier::toString).collect(Collectors.toCollection(ArrayList::new));
-                Identifier id = function.getId();
-                CommandFunctionType commandFunctionType = new CommandFunctionType();
-                if (id != null) commandFunctionType.id(id.toString());
-                advancement.rewards
-                        .function(new LazyContainerType()
-                                .function(commandFunctionType));
-
-                if (parent.text.getContent() instanceof TranslatableTextContent translatable){
-                    advancement.englishName(en_us().get(translatable.getKey()));
-                    if (zh_cn().hasTranslation(translatable.getKey())){
-                        advancement.name(zh_cn().get(translatable.getKey()));
-                    }
-                }
-                else {
-                    advancement.name(parent.text.getContent().toString());
-                    advancement.englishName(parent.text.getContent().toString());
-                }
-                Map<String, AdvancementCriterion> criteria = parent.getCriteria();
-                for (Map.Entry<String, AdvancementCriterion> entry : criteria.entrySet()) {
-                    CriterionConditions conditions = entry.getValue().getConditions();
-                    if (conditions != null)
-                        advancement
-                            .criteria(entry.getKey(), new AdvancementCriterionType()
-                            .registerName(conditions.getId().toString()));
-                }
-                String[][] requirements = parent.getRequirements();
-
-                for (String[] requirement : requirements)
-                    advancement.requirements(requirement);
-                advancement.sendsTelemetryEvent(parent.sendsTelemetryEvent());
-
-
-                modidAdvancements.advancement(registerName, advancement);
+                AdvancementHelper advancementHelper = new AdvancementHelper(parent.getId().toString(), this$advanceParameters);
             }
             modidAdvancements.save(advancementsJson);
         });
@@ -239,10 +184,14 @@ public class ExporterCommand extends CommandHelper implements Serializable {
 
     public BlockAndItemSerializable itemAndBlockExporterStack(ItemStack stack, BlockAndItems blockAndItems) {
         String registerName = Registries.ITEM.getId(stack.getItem()).toString();
-        ItemAndBlockHelper helper = new ItemAndBlockHelper(registerName, this$advanceParameters);
-        return Objects.requireNonNullElseGet(blockAndItems.find(registerName), () -> blockAndItemSerializable(blockAndItem -> {
-            blockAndItem.type = helper.save(stack, blockAndItems, blockAndItem);
-        }));
+        ItemAndBlockHelper helper =
+                new ItemAndBlockHelper(registerName, this$advanceParameters);
+        return Objects.requireNonNullElseGet(
+                blockAndItems.find(registerName),
+                () -> blockAndItemSerializable(blockAndItem -> {
+                    blockAndItem.type = helper.save(stack, blockAndItems, blockAndItem);
+                })
+        );
     }
 
     @NotNull
@@ -269,62 +218,6 @@ public class ExporterCommand extends CommandHelper implements Serializable {
                 Item item = registry.get(modItemId);
                 BlockAndItemSerializable serializable = itemAndBlockExporterStack(item.getDefaultStack(), blockAndItems);
             }
-
-//                AtomicBoolean b = new AtomicBoolean(true);
-//                itemAndBlockHelper
-//                        .init(item)
-//                        .setup(t -> {
-//                            if (item instanceof BlockItem blockItem) {
-//                                Block block = blockItem.getBlock();
-//
-//                                BlockType blockType = new BlockType()
-//                                        .hardness(block.getHardness())
-//                                        .luminance(block.getDefaultState().getLuminance())
-//                                        .resistance(block.getBlastResistance());
-//                                if (block instanceof FluidBlock fluid) {
-//                                    FluidState liquid = fluid.getFluidState(fluid.getDefaultState());
-//                                    blockType.asFluid(UniExporterExpectPlatform
-//                                            .fluidType(new FluidType()
-//                                                    .source(liquid.isStill()), (FlowableFluid) liquid.getFluid())
-//                                            .asBucket(registry.getId(liquid.getFluid().getBucketItem()).toString()));
-//                                }
-//                                type.asBlock(blockType);
-//                                blockAndItems.block(registryId.toString(), serializable.type(type.type("block-item")));
-//                                b.set(false);
-//                            }
-//                            return itemAndBlockHelper;
-//                        })
-//                        .setup(t -> {
-//                            if (item instanceof ArmorItem tool) {
-//                                blockAndItems.tool(registryId.toString(), serializable.type(t.type("tools")));
-//                                b.set(false);
-//                            }
-//                            return itemAndBlockHelper;
-//                        })
-//                        .setup(t -> {
-//                            if (item instanceof BucketItem bucket) {
-//
-//                                blockAndItems.item(registryId.toString(), serializable.type(t.asFluid(Registries.FLUID.getId(bucket.fluid).toString()).type("item")));
-//                                b.set(false);
-//                            }
-//                            return itemAndBlockHelper;
-//                        })
-//                        .setup(t -> {
-//                            if (item instanceof ArmorItem armor) {
-//                                blockAndItems.armor(registryId.toString(), serializable.type(t.type("buck-item")));
-//                                b.set(false);
-//                            }
-//
-//                            return itemAndBlockHelper;
-//                        })
-//                        .setup(t -> {
-//                            if (b.get()) {
-//                                blockAndItems.item(registryId.toString(), serializable.type(t.type("item")));
-//                            }
-//                            return itemAndBlockHelper;
-//                        });
-//
-//            }
             blockAndItems.save(itemAndBlocksJson);
         }, executorService);
     }
@@ -333,6 +226,7 @@ public class ExporterCommand extends CommandHelper implements Serializable {
      * Exporting item and block
      */
     public void itemAndBlockExporterAll() {
+
         generationAll(this::itemAndBlockExporterModid);
     }
 

@@ -7,5 +7,4 @@ package org.uniexporter.exporter.adapter;
 @Deprecated
 public class Main {
 
-
 }

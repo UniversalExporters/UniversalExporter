@@ -8,14 +8,17 @@ import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class ItemType implements Self<ItemType> {
-    public Integer maxStackSize;
-    public Integer maxDurability;
+    public int maxStackSize;
+    public int maxDurability;
     public ArrayList<String> OredictList;
     public IconType icon;
     public BlockType asBlock;
     public String asFluid;
     public Integer maxUseTime;
     public FoodType asFood;
+    public ToolType tool;
+    public ArmorType armor;
+    public int fuelTime;
 
     public NbtType nbt;
 

@@ -23,6 +23,10 @@ accessible field net/minecraft/entity/effect/StatusEffectInstance type Lnet/mine
 accessible field net/minecraft/block/AbstractBlock collidable Z
 accessible field net/minecraft/block/AbstractBlock randomTicks Z
 accessible field net/minecraft/item/MiningToolItem effectiveBlocks Lnet/minecraft/registry/tag/TagKey;
+accessible field net/minecraft/item/MiningToolItem miningSpeed F
+
+
+
 
 
 
