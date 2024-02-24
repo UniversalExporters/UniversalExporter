@@ -23,6 +23,7 @@ dependencies {
 //    include(libs.adapter)
     implementation("org.uniexporter.exporter:adapter")
     include("org.uniexporter.exporter:adapter")
+
 }
 
 processResources {

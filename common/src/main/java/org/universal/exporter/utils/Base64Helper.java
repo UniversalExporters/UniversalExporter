@@ -40,7 +40,7 @@ public class Base64Helper implements Serializable, IBase64Helper<Item, ItemStack
         return type;
     }
 
-    public Pair<String, String> itemStackToBase64(ItemStack stack) {
+    public static Pair<String, String> itemStackToBase64(ItemStack stack) {
         Pair<FrameHelper, FrameHelper> pair = FrameHelper.of(stack);
         String smallBase64, largeBase64;
         try(

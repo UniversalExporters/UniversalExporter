@@ -2,11 +2,9 @@ package org.universal.exporter.utils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.FluidBlock;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
@@ -18,18 +16,12 @@ import org.uniexporter.exporter.adapter.serializable.BlockAndItems;
 import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.*;
 import org.uniexporter.exporter.adapter.serializable.type.status.FactorCalculationDataType;
 import org.uniexporter.exporter.adapter.serializable.type.status.StatusEffectInstanceType;
-import org.universal.exporter.UniExporterExpectPlatform;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-import static org.uniexporter.exporter.adapter.faces.Save.gson;
 import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.BlockType.blockType;
 import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.FoodType.foodType;
 import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.NbtType.nbtType;
@@ -54,16 +46,6 @@ public class ItemAndBlockHelper extends DefaultHelper<ItemAndBlockHelper> {
         return this;
     }
 
-    public ItemAndBlockHelper checkAndSaveInBlockOrFluids(BlockAndItems blockAndItems, BlockAndItemSerializable blockAndItem, BlockType blockType, Block block, BlockState defaultState) {
-        if (block instanceof FluidBlock fluidBlock) {
-            blockAndItems.fluid(registerName, blockAndItem);
-            blockType.asFluid = UniExporterExpectPlatform.fluidType(new FluidType(), (FlowableFluid) fluidBlock.getFluidState(defaultState).getFluid());
-        } else {
-            blockAndItems.block(registerName, blockAndItem);
-        }
-        return self();
-    }
-
     public ItemAndBlockHelper defaultSetItemSettings(ItemStack stack, ItemType type) {
         type.maxStackSize = stack.getItem().getMaxCount();
         type.maxDurability = stack.getItem().getMaxDamage();
@@ -73,34 +55,25 @@ public class ItemAndBlockHelper extends DefaultHelper<ItemAndBlockHelper> {
     }
 
     @NotNull
-    public ItemType save(ItemStack stack, BlockAndItems blockAndItems, BlockAndItemSerializable blockAndItem) {
+    public ItemType save(ItemStack stack, BlockAndItemSerializable blockAndItem) {
         return ItemType.itemType(type -> {
             defaultSetItemSettings(stack, type)
                     .language(blockAndItem, stack)
                     // LanguageHelper.get
-                    .checkAndSaveInFood(stack, blockAndItems, blockAndItem, type)
+                    .checkAndSaveInFood(stack, type)
                     // stack.getItem().isFood()
-                    .blockSettings(blockAndItems, blockAndItem, type, stack)
+                    .blockSettings(type, stack)
                     // instanceof BlockItem block instanceof FluidBlock else other
-                    .miningTool(blockAndItems, blockAndItem, stack, type) // instanceof MiningToolItem miningTool
-                    .armor(blockAndItems, blockAndItem, stack, type) // instanceof ArmorItem armorItem
+                    .miningTool(stack, type) // instanceof MiningToolItem miningTool
+                    .armor(stack, type) // instanceof ArmorItem armorItem
                     .fuelSet(stack, type) // add fuel time if fuel time == 0 item isn't fuel
-                    .not(blockAndItems, blockAndItem)
                     .setHasNbt(type, stack.getNbt())// nbtCompound != null
             ;
         });
     }
 
-    private ItemAndBlockHelper not(BlockAndItems blockAndItems, BlockAndItemSerializable blockAndItem) {
-        if (blockAndItems.find(registerName) == null) {
-            blockAndItems.item(registerName, blockAndItem);
-        }
-        return self();
-    }
-
-    public ItemAndBlockHelper armor(BlockAndItems blockAndItems, BlockAndItemSerializable blockAndItem, ItemStack stack, ItemType type) {
+    public ItemAndBlockHelper armor(ItemStack stack, ItemType type) {
         if (stack.getItem() instanceof ArmorItem armorItem) {
-            blockAndItems.armor(registerName, blockAndItem);
             type.armor = ArmorType.armorType(armor -> {
                 armor.enchantability = armorItem.getEnchantability();
                 armor.equipmentSlot = armorItem.getType().getEquipmentSlot().getName();
@@ -118,9 +91,9 @@ public class ItemAndBlockHelper extends DefaultHelper<ItemAndBlockHelper> {
     }
 
     @SuppressWarnings("unchecked")
-    public ItemAndBlockHelper miningTool(BlockAndItems blockAndItems, BlockAndItemSerializable blockAndItem, ItemStack stack, ItemType type) {
+    public ItemAndBlockHelper miningTool(ItemStack stack, ItemType type) {
         if (stack.getItem() instanceof MiningToolItem miningTool) {
-            blockAndItems.tool(registerName, blockAndItem);
+
             type.tool = toolType(tool -> {
                 tool.tagId = miningTool.effectiveBlocks.id().toString();
                 ToolMaterial toolMaterial = ((Supplier<ToolMaterial>) miningTool).get();
@@ -181,16 +154,14 @@ public class ItemAndBlockHelper extends DefaultHelper<ItemAndBlockHelper> {
         return self();
     }
 
-    public ItemAndBlockHelper blockSettings(BlockAndItems blockAndItems, BlockAndItemSerializable blockAndItem, ItemType type, ItemStack stack) {
+    public ItemAndBlockHelper blockSettings(ItemType type, ItemStack stack) {
         if (stack.getItem() instanceof BlockItem blockItem) {
-
             Block block = blockItem.getBlock();
             BlockState defaultState = block.getDefaultState();
 
             type.asBlock = blockType(blockType ->
                     defaultBlockType(blockType, defaultState, block)
-                            .advanceParameterBlockType(blockType, defaultState, block)
-                            .checkAndSaveInBlockOrFluids(blockAndItems, blockAndItem, blockType, block, defaultState));
+                            .advanceParameterBlockType(blockType, defaultState, block));
         }
         return self();
     }
@@ -263,9 +234,8 @@ public class ItemAndBlockHelper extends DefaultHelper<ItemAndBlockHelper> {
 
 
 
-    public ItemAndBlockHelper checkAndSaveInFood(ItemStack stack, BlockAndItems blockAndItems, BlockAndItemSerializable blockAndItem, ItemType type) {
+    public ItemAndBlockHelper checkAndSaveInFood(ItemStack stack, ItemType type) {
         if (stack.getItem().isFood()) {
-            blockAndItems.food(registerName, blockAndItem);
             foodTypeSet(stack, type, stack.getItem());
         }
         return self();
