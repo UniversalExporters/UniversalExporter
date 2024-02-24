@@ -8,9 +8,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.advancement.Advancement;
-import net.minecraft.advancement.AdvancementCriterion;
-import net.minecraft.advancement.AdvancementRewards;
-import net.minecraft.advancement.criterion.CriterionConditions;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,18 +16,11 @@ import net.minecraft.registry.DefaultedRegistry;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.function.CommandFunction;
-import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
-import org.uniexporter.exporter.adapter.serializable.AdvancementSerializable;
 import org.uniexporter.exporter.adapter.serializable.Advancements;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItems;
-import org.uniexporter.exporter.adapter.serializable.type.advancement.AdvancementCriterionType;
-import org.uniexporter.exporter.adapter.serializable.type.advancement.AdvancementRewardsType;
-import org.uniexporter.exporter.adapter.serializable.type.advancement.CommandFunctionType;
-import org.uniexporter.exporter.adapter.serializable.type.advancement.LazyContainerType;
 import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ItemType;
 import org.universal.exporter.UniExporter;
 import org.universal.exporter.UniExporterExpectPlatform;
@@ -49,16 +39,12 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 import static org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable.blockAndItemSerializable;
-import static org.uniexporter.exporter.adapter.serializable.type.advancement.AdvancementDisplayType.advancementDisplayType;
-import static org.uniexporter.exporter.adapter.serializable.type.advancement.AdvancementRewardsType.advancementRewardsType;
 import static org.universal.exporter.command.argument.ExporterArgumentType.getExporter;
 import static org.universal.exporter.command.argument.ModidArgumentType.getModidType;
-import static org.universal.exporter.utils.Base64Helper.icon;
 import static org.universal.exporter.utils.LanguageHelper.en_us;
 import static org.universal.exporter.utils.LanguageHelper.zh_cn;
 /**
@@ -166,13 +152,28 @@ public class ExporterCommand extends CommandHelper implements Serializable {
         List<Advancement> advancements = context.getSource().getServer().getAdvancementLoader().getAdvancements().stream().toList();
 
         CompletableFuture.runAsync(() -> {
-            List<Advancement> parents = advancements.stream().filter(advancement -> advancement.getParent() == null).toList();
+//            List<Advancement> parents = advancements.stream().filter(advancement -> advancement.getParent() == null).toList();
+
             Advancements modidAdvancements = new Advancements();
-            for (Advancement parent : parents) {
-                AdvancementHelper advancementHelper = new AdvancementHelper(parent.getId().toString(), this$advanceParameters);
-                advancementHelper.parentAdvancementSet(parent, modidAdvancements);
-            }
+            advancements.stream().filter(advancement -> advancement.getParent() == null).forEachOrdered(parent -> {
+                new AdvancementHelper(parent.getId().toString(), this$advanceParameters).advancementSet(parent, modidAdvancements);
+            });
+
+            subAdvancementSet(modidAdvancements, advancements);
             modidAdvancements.save(advancementsJson);
+        });
+    }
+
+    private void subAdvancementSet(Advancements modidAdvancements, List<Advancement> advancements) {
+        modidAdvancements.advancements.forEach((registerName, serializable) -> {
+            advancements.stream()
+                    .filter(advancement -> advancement.getParent() != null && advancement.getParent().getId().toString().equals(registerName))
+                    .forEachOrdered(subAdvancement -> {
+                        serializable.children(advancements1 -> {
+                            new AdvancementHelper(subAdvancement.getId().toString(), this$advanceParameters).advancementSet(subAdvancement, modidAdvancements);
+                        });
+                        subAdvancementSet(serializable.children, advancements);
+                    });
         });
     }
 

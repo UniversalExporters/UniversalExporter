@@ -35,7 +35,7 @@ public class AdvancementHelper extends DefaultHelper<AdvancementHelper> {
     }
 
 
-    public AdvancementHelper parentAdvancementSet(Advancement parent, Advancements advancements) {
+    public AdvancementHelper advancementSet(Advancement parent, Advancements advancements) {
         var display = parent.getDisplay();
         AdvancementRewards rewards = parent.getRewards();
         CommandFunction.LazyContainer function = rewards.function;

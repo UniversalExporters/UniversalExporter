@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class AdvancementSerializable extends NameType implements Self<AdvancementSerializable> {
-    public ArrayList<AdvancementSerializable> children;
+    public Advancements children;
     public AdvancementDisplayType display;
     public AdvancementRewardsType rewards;
 
@@ -66,9 +67,9 @@ public class AdvancementSerializable extends NameType implements Self<Advancemen
         return self();
     }
 
-    public AdvancementSerializable children(AdvancementSerializable child) {
-        if (children == null) children = new ArrayList<>();
-        children.add(child);
+    public AdvancementSerializable children(Consumer<Advancements> consumer) {
+        if (children == null) children = new Advancements();
+        consumer.accept(children);
         return self();
     }
 }
