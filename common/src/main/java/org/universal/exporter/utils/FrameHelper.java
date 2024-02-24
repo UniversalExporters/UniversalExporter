@@ -20,10 +20,11 @@ import net.minecraft.util.Pair;
 import org.joml.Matrix4f;
 import org.uniexporter.exporter.adapter.utils.IFrameHelper;
 
+import java.io.IOException;
 import java.util.Base64;
 
 public class FrameHelper implements IFrameHelper<NativeImage, ItemStack, BakedModel, ItemRenderer> {
-    private final Framebuffer fbo;
+    public final Framebuffer fbo;
     private MatrixStack matrixStack;
     private static final int lightSet = 15728880;
 
@@ -106,6 +107,14 @@ public class FrameHelper implements IFrameHelper<NativeImage, ItemStack, BakedMo
         } catch (Throwable e) {
             return "";
         }
+    }
+
+    public String base64() {
+        try(NativeImage nativeImage = dumpFrom()) {
+            return Base64.getEncoder().encodeToString(nativeImage.getBytes());
+        } catch (IOException ignored) {
+        }
+        return null;
     }
 
     @Override

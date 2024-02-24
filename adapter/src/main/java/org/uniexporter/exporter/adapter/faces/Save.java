@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public interface Save {
-    Gson gson = new GsonBuilder().setLenient().setPrettyPrinting().disableJdkUnsafe().create();
+    Gson gson = new GsonBuilder().setLenient().setPrettyPrinting().create();
     @SuppressWarnings("ResultOfMethodCallIgnored")
     default void save(Path path) {
         Path parent = path.getParent();

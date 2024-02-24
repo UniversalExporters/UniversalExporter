@@ -1,25 +1,40 @@
 package org.uniexporter.exporter.adapter.serializable.type.itemAndBlock;
 
+import com.google.gson.annotations.SerializedName;
 import org.uniexporter.exporter.adapter.annotations.AdvancementParameters;
 import org.uniexporter.exporter.adapter.faces.Self;
 import org.uniexporter.exporter.adapter.serializable.type.IconType;
+import org.uniexporter.exporter.adapter.serializable.type.NameType;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class ItemType implements Self<ItemType> {
+    @SerializedName("tab")
+    public NameType tab;
+    @SerializedName("maxStackSize")
     public int maxStackSize;
+    @SerializedName("maxDurability")
     public int maxDurability;
+    @SerializedName("OredictList")
     public ArrayList<String> OredictList;
+    @SerializedName("icon")
     public IconType icon;
+    @SerializedName("asBlock")
     public BlockType asBlock;
+    @SerializedName("asFluid")
     public String asFluid;
+    @SerializedName("maxUseTime")
     public Integer maxUseTime;
+    @SerializedName("asFood")
     public FoodType asFood;
+    @SerializedName("tool")
     public ToolType tool;
+    @SerializedName("armor")
     public ArmorType armor;
+    @SerializedName("fuelTime")
     public int fuelTime;
-
+    @SerializedName("nbt")
     public NbtType nbt;
 
     public static ItemType itemType(Consumer<ItemType> consumer) {

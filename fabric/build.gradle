@@ -17,10 +17,7 @@ dependencies {
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
-//    implementation(libs.adapter)
-    implementation(libs.gson)
-    include(libs.gson)
-//    include(libs.adapter)
+
     implementation("org.uniexporter.exporter:adapter")
     include("org.uniexporter.exporter:adapter")
 

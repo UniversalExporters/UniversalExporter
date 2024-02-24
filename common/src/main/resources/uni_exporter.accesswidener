@@ -24,8 +24,9 @@ accessible field net/minecraft/block/AbstractBlock collidable Z
 accessible field net/minecraft/block/AbstractBlock randomTicks Z
 accessible field net/minecraft/item/MiningToolItem effectiveBlocks Lnet/minecraft/registry/tag/TagKey;
 accessible field net/minecraft/item/MiningToolItem miningSpeed F
-
-
+accessible field net/minecraft/item/ItemGroups HOTBAR Lnet/minecraft/registry/RegistryKey;
+accessible field net/minecraft/item/ItemGroups INVENTORY Lnet/minecraft/registry/RegistryKey;
+accessible field net/minecraft/item/ItemGroups SEARCH Lnet/minecraft/registry/RegistryKey;
 
 
 

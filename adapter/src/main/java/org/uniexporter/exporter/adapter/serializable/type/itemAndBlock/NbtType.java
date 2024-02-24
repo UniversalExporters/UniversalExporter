@@ -1,9 +1,13 @@
 package org.uniexporter.exporter.adapter.serializable.type.itemAndBlock;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class NbtType {
+    @SerializedName("entries")
     public ConcurrentHashMap<String, Object> entries;
 
     public static NbtType nbtType(Consumer<NbtType> consumer) {
@@ -11,5 +15,10 @@ public class NbtType {
         nbtType.entries = new ConcurrentHashMap<>();
         consumer.accept(nbtType);
         return nbtType;
+    }
+
+    public void entry(String key, Object entry) {
+        if (entries == null) entries = new ConcurrentHashMap<>();
+        entries.put(key, entry);
     }
 }

@@ -28,10 +28,7 @@ dependencies {
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
-//    minecraftClientLibraries(libs.adapter)
-    implementation(libs.gson)
-//    include(libs.adapter)
-    include(libs.gson)
+
     common("org.uniexporter.exporter:adapter") { transitive false }
     shadowCommon("org.uniexporter.exporter:adapter") { transitive false }
 

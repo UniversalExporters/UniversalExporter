@@ -1,5 +1,6 @@
 package org.uniexporter.exporter.adapter.serializable.type.itemAndBlock;
 
+import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.Nullable;
 import org.uniexporter.exporter.adapter.faces.Self;
 
@@ -8,11 +9,17 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("UnusedReturnValue")
 public class ToolType implements Self<ToolType> {
+    @SerializedName("tagId")
     public String tagId;
+    @SerializedName("miningSpeed")
     public float miningSpeed;
+    @SerializedName("miningLevel")
     public float miningLevel;
+    @SerializedName("attackDamage")
     public float attackDamage;
+    @SerializedName("enchantability")
     public int enchantability;
+    @SerializedName("repairIngredients")
     public ConcurrentHashMap<String, NbtType> repairIngredients;
 
     public ToolType repairIngredient(String registerName, @Nullable NbtType nbt) {

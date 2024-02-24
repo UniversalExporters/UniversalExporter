@@ -1,5 +1,6 @@
 package org.uniexporter.exporter.adapter.serializable;
 
+import com.google.gson.annotations.SerializedName;
 import org.uniexporter.exporter.adapter.faces.Self;
 import org.uniexporter.exporter.adapter.serializable.type.NameType;
 import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ItemType;
@@ -8,6 +9,7 @@ import java.util.function.Consumer;
 
 public class BlockAndItemSerializable extends NameType implements Self<BlockAndItemSerializable> {
 
+    @SerializedName("type")
     public ItemType type;
 
     public static BlockAndItemSerializable blockAndItemSerializable(Consumer<BlockAndItemSerializable> consumer) {

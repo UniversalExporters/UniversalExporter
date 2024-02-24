@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  */
 public class LoadAndGeneratorConfig<T> implements Supplier<T> {
 
-    public static final Gson GSON = new GsonBuilder().disableJdkUnsafe().setLenient().setPrettyPrinting().create();
+    public static final Gson GSON = new GsonBuilder().setLenient().setPrettyPrinting().create();
     private final T defaultConfig;
     private final Path configPath;
     private final Class<T> clazz;

@@ -22,6 +22,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.uniexporter.exporter.adapter.serializable.Advancements;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
@@ -38,9 +39,7 @@ import org.universal.exporter.command.argument.ExporterArgumentType;
 import org.universal.exporter.command.argument.ModidArgumentType;
 import org.universal.exporter.command.type.ExporterType;
 import org.universal.exporter.command.type.ModidType;
-import org.universal.exporter.utils.AdvancementHelper;
-import org.universal.exporter.utils.CommandHelper;
-import org.universal.exporter.utils.ItemAndBlockHelper;
+import org.universal.exporter.utils.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -152,15 +151,19 @@ public class ExporterCommand extends CommandHelper implements Serializable {
     }
 
     public int all() {
-        if (this$select == null) {
-            itemAndBlockExporterAll();
-            advancementsAll();
-        } else {
-            if (this$select.equals(ExporterType.itemandblock)) {
+        try {
+            if (this$select == null) {
                 itemAndBlockExporterAll();
-            } else if (this.this$select.equals(ExporterType.advancements)) {
                 advancementsAll();
+            } else {
+                if (this$select.equals(ExporterType.itemandblock)) {
+                    itemAndBlockExporterAll();
+                } else if (this.this$select.equals(ExporterType.advancements)) {
+                    advancementsAll();
+                }
             }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
 
         return defaultCommandSources();
@@ -171,22 +174,13 @@ public class ExporterCommand extends CommandHelper implements Serializable {
         Path advancementsJson = exporter.resolve(modid).resolve("advancements.json");
         List<Advancement> advancements = context.getSource().getServer().getAdvancementLoader().getAdvancements().stream().toList();
 
-        CompletableFuture<Void> voidCompletableFuture = CompletableFuture.runAsync(() -> {
-//            List<Advancement> parents = advancements.stream().filter(advancement -> advancement.getParent() == null).toList();
-
-            Advancements modidAdvancements = new Advancements();
-            advancements.stream().filter(advancement -> advancement.getParent() == null).forEachOrdered(parent -> {
-                new AdvancementHelper(parent.getId().toString(), this$advanceParameters).advancementSet(parent, modidAdvancements);
-            });
-
-            subAdvancementSet(modidAdvancements, advancements);
-            modidAdvancements.save(advancementsJson);
+        Advancements modidAdvancements = new Advancements();
+        advancements.stream().filter(advancement -> advancement.getParent() == null).forEachOrdered(parent -> {
+            new AdvancementHelper(parent.getId().toString(), this$advanceParameters).advancementSet(parent, modidAdvancements);
         });
-        try {
-            Void unused = CompletableFuture.allOf(voidCompletableFuture).get();
-        } catch (InterruptedException | ExecutionException ignored) {
 
-        }
+        subAdvancementSet(modidAdvancements, advancements);
+        modidAdvancements.save(advancementsJson);
     }
 
     private void subAdvancementSet(Advancements modidAdvancements, List<Advancement> advancements) {
@@ -419,37 +413,64 @@ public class ExporterCommand extends CommandHelper implements Serializable {
     }
 
     public void itemAndBlockExporterStack(ItemStack stack, BlockAndItems blockAndItems) {
+        FrameHelper smallIconFrame = new FrameHelper(32, stack);
+        FrameHelper largeIconFrame = new FrameHelper(128, stack);
         Item item = stack.getItem();
         String registerName = Registries.ITEM.getId(item).toString();
-        BlockAndItemSerializable blockAndItemSerializable = blockAndItemSerializable(blockAndItem -> {
-            defaultItemProperties(stack, blockAndItem);
-        });
+        BlockAndItemSerializable blockAndItem = new BlockAndItemSerializable();
+        defaultItemProperties(stack, blockAndItem, smallIconFrame, largeIconFrame);
         if (item.isFood()) {
-            blockAndItems.food(registerName, blockAndItemSerializable);
+            blockAndItems.food(registerName, blockAndItem);
         } else if (item instanceof BlockItem blockItem) {
             if (blockItem.getBlock() instanceof FluidBlock) {
-                blockAndItems.fluid(registerName, blockAndItemSerializable);
+                blockAndItems.fluid(registerName, blockAndItem);
             } else {
-                blockAndItems.block(registerName, blockAndItemSerializable);
+                blockAndItems.block(registerName, blockAndItem);
             }
         } else if (item instanceof MiningToolItem) {
-            blockAndItems.tool(registerName, blockAndItemSerializable);
+            blockAndItems.tool(registerName, blockAndItem);
         } else if (item instanceof ArmorItem) {
-            blockAndItems.armor(registerName, blockAndItemSerializable);
+            blockAndItems.armor(registerName, blockAndItem);
         } else {
-            blockAndItems.item(registerName, blockAndItemSerializable);
+            blockAndItems.item(registerName, blockAndItem);
         }
     }
 
 
 
-
+    //优先级 流体>方块>桶>盔甲>工具>食物>普通物品
     public void itemAndBlockExporterModid(String modid) {
+
         BlockAndItems blockAndItems = new BlockAndItems();
         Path itemAndBlocksJson = exporter.resolve(modid).resolve("item-and-block.json");
-        Registries.ITEM.getIds().forEach(identifier -> {
-            Item item = Registries.ITEM.get(identifier);
-            itemAndBlockExporterStack(item.getDefaultStack(), blockAndItems);
+        ExporterHelper exporterHelper = new ExporterHelper(modid, this$advanceParameters);
+        exporterHelper.itemExporter();
+        exporterHelper.items.forEach((registerName, serializables) -> {
+            for (BlockAndItemSerializable serializable : serializables) {
+                if (serializable.type.asBlock != null) {
+                    if (serializable.type.asBlock.asFluid != null) {
+                        blockAndItems.fluid(registerName, serializable);
+                    } else {
+                        blockAndItems.block(registerName, serializable);
+                    }
+                }
+                else if (serializable.type.asFluid != null) {
+                    blockAndItems.bucket(registerName, serializable);
+                }
+                else if (serializable.type.armor != null) {
+                    blockAndItems.armor(registerName, serializable);
+                }
+                else if (serializable.type.tool != null) {
+                    blockAndItems.tool(registerName, serializable);
+                }
+                else if (serializable.type.asFood != null) {
+                    blockAndItems.food(registerName, serializable);
+                }
+                else {
+                    blockAndItems.item(registerName, serializable);
+                }
+
+            }
         });
 
         blockAndItems.save(itemAndBlocksJson);
@@ -459,19 +480,11 @@ public class ExporterCommand extends CommandHelper implements Serializable {
      * Exporting item and block
      */
     public void itemAndBlockExporterAll() {
-        List<CompletableFuture<?>> futures = new ArrayList<>();
         if (this$modid != null) {
-            futures.add(CompletableFuture.runAsync(() -> {
-                itemAndBlockExporterModid(this$modid.asString());
-            }, executorService));
+            itemAndBlockExporterModid(this$modid.asString());
         } else {
-            Arrays.stream(ModidType.values()).map(ModidType::name).forEach(modid -> {
-                futures.add(CompletableFuture.runAsync(() -> {
-                    itemAndBlockExporterModid(modid);
-                }, executorService));
-            });
+            Arrays.stream(ModidType.values()).map(ModidType::name).forEach(this::itemAndBlockExporterModid);
         }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
 
