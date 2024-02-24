@@ -42,11 +42,10 @@ public class AdvancementHelper extends DefaultHelper<AdvancementHelper> {
         Map<String, AdvancementCriterion> criteria = parent.getCriteria();
         String[][] requirements = parent.getRequirements();
         advancements.advancement(registerName, advancement(advancement -> {
-            if (display != null)
-                advancement.display = advancementDisplayType(advancementDisplay -> displaySet(advancementDisplay, display));
-            rewardsSet(advancement, rewards, function);
-            advancement.englishName(en_us().get(parent.text.getContent()));
-            advancement.name(zh_cn().get(parent.text.getContent()));
+            advancement.display = advancementDisplayType(advancementDisplay -> displaySet(advancementDisplay, display));
+
+            rewardsSet(advancement, rewards, function)
+                    .nameSet(parent, advancement);
             for (Map.Entry<String, AdvancementCriterion> entry : criteria.entrySet()) {
                 CriterionConditions conditions = entry.getValue().getConditions();
                 if (conditions != null)
@@ -58,6 +57,12 @@ public class AdvancementHelper extends DefaultHelper<AdvancementHelper> {
                 advancement.requirements(requirement);
             advancement.sendsTelemetryEvent(parent.sendsTelemetryEvent());
         }));
+        return self();
+    }
+
+    private AdvancementHelper nameSet(Advancement parent, AdvancementSerializable advancement) {
+        advancement.englishName(en_us().get(parent.text.getContent()));
+        advancement.name(zh_cn().get(parent.text.getContent()));
         return self();
     }
 
@@ -78,18 +83,20 @@ public class AdvancementHelper extends DefaultHelper<AdvancementHelper> {
     }
 
     private AdvancementHelper displaySet(AdvancementDisplayType advancementDisplay, AdvancementDisplay display) {
-        advancementDisplay.title = zh_cn().get(display.getTitle().getContent());
-        advancementDisplay.englishTitle = en_us().get(display.getTitle().getContent());
-        advancementDisplay.description = zh_cn().get(display.getDescription().getContent());
-        advancementDisplay.englishDescription = en_us().get(display.getDescription().getContent());
-        advancementDisplay.icon(icon().itemStackToBase(display.getIcon()));
-        if (display.getBackground() != null) {
-            advancementDisplay.background(display.getBackground().toString(), this$advanceParameters);
+        if (display != null) {
+            advancementDisplay.title = zh_cn().get(display.getTitle().getContent());
+            advancementDisplay.englishTitle = en_us().get(display.getTitle().getContent());
+            advancementDisplay.description = zh_cn().get(display.getDescription().getContent());
+            advancementDisplay.englishDescription = en_us().get(display.getDescription().getContent());
+            advancementDisplay.icon(icon().itemStackToBase(display.getIcon()));
+            if (display.getBackground() != null) {
+                advancementDisplay.background(display.getBackground().toString(), this$advanceParameters);
+            }
+            advancementDisplay.frame = display.getFrame().getId();
+            advancementDisplay.showToast = display.shouldShowToast();
+            advancementDisplay.announceToChat = display.shouldAnnounceToChat();
+            advancementDisplay.hidden = display.isHidden();
         }
-        advancementDisplay.frame = display.getFrame().getId();
-        advancementDisplay.showToast = display.shouldShowToast();
-        advancementDisplay.announceToChat = display.shouldAnnounceToChat();
-        advancementDisplay.hidden = display.isHidden();
         return self();
     }
 }

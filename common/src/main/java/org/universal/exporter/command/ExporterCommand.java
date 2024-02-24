@@ -170,6 +170,7 @@ public class ExporterCommand extends CommandHelper implements Serializable {
             Advancements modidAdvancements = new Advancements();
             for (Advancement parent : parents) {
                 AdvancementHelper advancementHelper = new AdvancementHelper(parent.getId().toString(), this$advanceParameters);
+                advancementHelper.parentAdvancementSet(parent, modidAdvancements);
             }
             modidAdvancements.save(advancementsJson);
         });
