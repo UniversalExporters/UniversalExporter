@@ -11,12 +11,13 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.universal.exporter.accessor.ToolMaterialSupplier;
 
 import java.util.function.Supplier;
 
 @Debug(export = true)
 @Mixin(MiningToolItem.class)
-public class MixinMiningToolItem implements Supplier<ToolMaterial> {
+public class MixinMiningToolItem implements ToolMaterialSupplier {
     @Unique
     private ToolMaterial universalExporter$material;
     @Inject(method = "<init>", at= @At("RETURN"))
@@ -30,7 +31,7 @@ public class MixinMiningToolItem implements Supplier<ToolMaterial> {
     }
 
     @Override
-    public ToolMaterial get() {
+    public ToolMaterial universalExporter$get() {
         return universalExporter$material;
     }
 }

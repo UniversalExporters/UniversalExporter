@@ -6,6 +6,7 @@ import net.minecraft.advancement.AdvancementDisplay;
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.advancement.criterion.CriterionConditions;
 import net.minecraft.server.function.CommandFunction;
+import net.minecraft.text.MutableText;
 import net.minecraft.util.Identifier;
 import org.uniexporter.exporter.adapter.serializable.AdvancementSerializable;
 import org.uniexporter.exporter.adapter.serializable.Advancements;
@@ -19,9 +20,9 @@ import java.util.stream.Collectors;
 import static org.uniexporter.exporter.adapter.serializable.AdvancementSerializable.advancement;
 import static org.uniexporter.exporter.adapter.serializable.type.advancement.AdvancementDisplayType.advancementDisplayType;
 import static org.uniexporter.exporter.adapter.serializable.type.advancement.AdvancementRewardsType.advancementRewardsType;
+import static org.universal.exporter.accessor.LanguageAccessor.en_us;
+import static org.universal.exporter.accessor.LanguageAccessor.zh_cn;
 import static org.universal.exporter.utils.Base64Helper.icon;
-import static org.universal.exporter.utils.LanguageHelper.en_us;
-import static org.universal.exporter.utils.LanguageHelper.zh_cn;
 
 public class AdvancementHelper extends DefaultHelper<AdvancementHelper> {
 
@@ -61,8 +62,9 @@ public class AdvancementHelper extends DefaultHelper<AdvancementHelper> {
     }
 
     private AdvancementHelper nameSet(Advancement parent, AdvancementSerializable advancement) {
-        advancement.englishName(en_us().get(parent.text.getContent()));
-        advancement.name(zh_cn().get(parent.text.getContent()));
+        advancement.englishName(en_us().get(parent.text));
+        advancement.name(zh_cn().get(parent.text));
+
         return self();
     }
 
@@ -84,10 +86,10 @@ public class AdvancementHelper extends DefaultHelper<AdvancementHelper> {
 
     private AdvancementHelper displaySet(AdvancementDisplayType advancementDisplay, AdvancementDisplay display) {
         if (display != null) {
-            advancementDisplay.title = zh_cn().get(display.getTitle().getContent());
-            advancementDisplay.englishTitle = en_us().get(display.getTitle().getContent());
-            advancementDisplay.description = zh_cn().get(display.getDescription().getContent());
-            advancementDisplay.englishDescription = en_us().get(display.getDescription().getContent());
+            advancementDisplay.title = zh_cn().get(display.getTitle());
+            advancementDisplay.englishTitle = en_us().get(display.getTitle());
+            advancementDisplay.description = zh_cn().get(display.getDescription());
+            advancementDisplay.englishDescription = en_us().get(display.getDescription());
             advancementDisplay.icon(icon().itemStackToBase(display.getIcon()));
             if (display.getBackground() != null) {
                 advancementDisplay.background(display.getBackground().toString(), this$advanceParameters);

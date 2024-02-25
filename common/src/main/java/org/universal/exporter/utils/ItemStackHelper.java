@@ -18,13 +18,15 @@ import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.*;
 import org.uniexporter.exporter.adapter.serializable.type.status.StatusEffectInstanceType;
 import org.uniexporter.exporter.adapter.serializable.type.status.StatusEffectType;
 import org.universal.exporter.UniExporterExpectPlatform;
+import org.universal.exporter.accessor.ToolMaterialSupplier;
 
-import java.util.function.Supplier;
+import java.io.Serial;
+import java.io.Serializable;
 
 import static org.uniexporter.exporter.adapter.serializable.type.status.FactorCalculationDataType.factorCalculationDataType;
 import static org.uniexporter.exporter.adapter.serializable.type.status.StatusEffectInstanceType.statusEffectInstanceType;
-import static org.universal.exporter.utils.LanguageHelper.en_us;
-import static org.universal.exporter.utils.LanguageHelper.zh_cn;
+import static org.universal.exporter.accessor.LanguageAccessor.en_us;
+import static org.universal.exporter.accessor.LanguageAccessor.zh_cn;
 
 public class ItemStackHelper extends BlockAndItemSerializable {
     public ItemStackHelper(ItemStack stack, ItemGroup group, boolean advancement) {
@@ -99,7 +101,7 @@ public class ItemStackHelper extends BlockAndItemSerializable {
         else if (item instanceof MiningToolItem toolItem) {
             type.tool = new ToolType();
             type.tool.tagId = toolItem.effectiveBlocks.id().toString();
-            ToolMaterial toolMaterial = ((Supplier<ToolMaterial>) toolItem).get();
+            ToolMaterial toolMaterial = ((ToolMaterialSupplier) toolItem).universalExporter$get();
             type.tool.miningSpeed = toolMaterial.getMiningSpeedMultiplier();
             type.tool.attackDamage = toolMaterial.getAttackDamage();
             type.tool.miningLevel = toolMaterial.getMiningLevel();

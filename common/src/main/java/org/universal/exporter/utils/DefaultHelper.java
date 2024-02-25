@@ -4,8 +4,9 @@ import net.minecraft.item.ItemStack;
 import org.uniexporter.exporter.adapter.serializable.type.NameType;
 import org.uniexporter.exporter.adapter.utils.IDefaultHelper;
 
-import static org.universal.exporter.utils.LanguageHelper.en_us;
-import static org.universal.exporter.utils.LanguageHelper.zh_cn;
+import static org.universal.exporter.accessor.LanguageAccessor.en_us;
+import static org.universal.exporter.accessor.LanguageAccessor.zh_cn;
+
 
 public abstract class DefaultHelper<T extends DefaultHelper<T>> implements IDefaultHelper<T, ItemStack> {
 

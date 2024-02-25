@@ -1,3 +1,14 @@
 {
-  "accessWidener": "uni_exporter.accesswidener"
+  "accessWidener": "uni_exporter.accesswidener",
+  "injected_interfaces": {
+    "net/minecraft/class_1766": [
+      "org/universal/exporter/accessor/ToolMaterialSupplier"
+    ],
+    "net/minecraft/class_2477": [
+      "org/universal/exporter/accessor/LanguageAccessor"
+    ],
+    "net/minecraft/class_1799": [
+      "org/universal/exporter/accessor/ItemStackAccessor"
+    ]
+  }
 }
