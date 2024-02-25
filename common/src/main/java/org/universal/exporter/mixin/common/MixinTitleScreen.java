@@ -1,4 +1,4 @@
-package org.universal.exporter.mixin;
+package org.universal.exporter.mixin.common;
 
 import net.minecraft.client.gui.screen.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;

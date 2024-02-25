@@ -7,6 +7,8 @@ import org.uniexporter.exporter.adapter.serializable.type.IconType;
 import org.uniexporter.exporter.adapter.serializable.type.NameType;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class ItemType implements Self<ItemType> {
@@ -44,9 +46,28 @@ public class ItemType implements Self<ItemType> {
     }
 
     @AdvancementParameters(used = true)
+    @SerializedName("rarity")
     public String rarity;
+    @SerializedName("type")
 
     public String type;
+
+    @SerializedName("basicTooltips")
+    public ArrayList<NameType> basicTooltips;
+    @SerializedName("advanceTooltips")
+    public ArrayList<NameType> advanceTooltips;
+
+    public ItemType basicTooltip(NameType basicTooltip) {
+        if (this.basicTooltips == null) basicTooltips = new ArrayList<>();
+        basicTooltips.add(basicTooltip);
+        return self();
+    }
+
+    public ItemType advanceTooltip(NameType advanceTooltip) {
+        if (this.advanceTooltips == null) advanceTooltips = new ArrayList<>();
+        advanceTooltips.add(advanceTooltip);
+        return self();
+    }
 
     public ItemType type(String type) {
         this.type = type;
@@ -86,5 +107,18 @@ public class ItemType implements Self<ItemType> {
     public ItemType asFluid(String asFluid) {
         this.asFluid = asFluid;
         return self();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ItemType itemType = (ItemType) o;
+        return maxStackSize == itemType.maxStackSize && maxDurability == itemType.maxDurability && fuelTime == itemType.fuelTime && Objects.equals(OredictList, itemType.OredictList) && Objects.equals(icon, itemType.icon) && Objects.equals(asBlock, itemType.asBlock) && Objects.equals(asFluid, itemType.asFluid) && Objects.equals(maxUseTime, itemType.maxUseTime) && Objects.equals(asFood, itemType.asFood) && Objects.equals(tool, itemType.tool) && Objects.equals(armor, itemType.armor) && Objects.equals(nbt, itemType.nbt) && Objects.equals(rarity, itemType.rarity) && Objects.equals(type, itemType.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(maxStackSize, maxDurability, OredictList, icon, asBlock, asFluid, maxUseTime, asFood, tool, armor, fuelTime, nbt, rarity, type);
     }
 }

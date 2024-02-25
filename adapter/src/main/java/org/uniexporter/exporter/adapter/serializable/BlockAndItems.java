@@ -5,8 +5,6 @@ import org.uniexporter.exporter.adapter.faces.Save;
 import org.uniexporter.exporter.adapter.faces.Self;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,61 +23,76 @@ public class BlockAndItems implements Save, Self<BlockAndItems> {
     public ConcurrentHashMap<String, ArrayList<BlockAndItemSerializable>> fluids;
     @SerializedName("buckets")
     public ConcurrentHashMap<String, ArrayList<BlockAndItemSerializable>> buckets;
+    @SerializedName("spawnEggs")
+    public ConcurrentHashMap<String, ArrayList<BlockAndItemSerializable>> spawnEggs;
 
 
     public BlockAndItems bucket(String registryName, BlockAndItemSerializable bucket) {
         if (this.buckets == null) this.buckets = new ConcurrentHashMap<>();
         ArrayList<BlockAndItemSerializable> list = buckets.containsKey(registryName) ? buckets.get(registryName) : new ArrayList<>();
-        list.add(bucket);
-        this.buckets.put(registryName, list);
+
+        this.buckets.put(registryName, checkHas(list, bucket));
         return self();
     }
 
     public BlockAndItems fluid(String registryName, BlockAndItemSerializable fluid) {
         if (this.fluids == null) this.fluids = new ConcurrentHashMap<>();
         ArrayList<BlockAndItemSerializable> list = fluids.containsKey(registryName) ? fluids.get(registryName) : new ArrayList<>();
-        list.add(fluid);
-        this.fluids.put(registryName, list);
+
+        this.fluids.put(registryName, checkHas(list, fluid));
         return self();
     }
 
     public BlockAndItems item(String registryName, BlockAndItemSerializable item) {
         if (this.items == null) this.items = new ConcurrentHashMap<>();
         ArrayList<BlockAndItemSerializable> list = items.containsKey(registryName) ? items.get(registryName) : new ArrayList<>();
-        list.add(item);
-        items.put(registryName, list);
+        items.put(registryName, checkHas(list, item));
         return self();
     }
     public BlockAndItems armor(String registryName, BlockAndItemSerializable armor) {
         if (this.armors == null) this.armors = new ConcurrentHashMap<>();
         ArrayList<BlockAndItemSerializable> list = armors.containsKey(registryName) ? armors.get(registryName) : new ArrayList<>();
-        list.add(armor);
-        armors.put(registryName, list);
+        armors.put(registryName, checkHas(list, armor));
         return self();
     }
     public BlockAndItems tool(String registryName, BlockAndItemSerializable tool) {
         if (this.tools == null) this.tools = new ConcurrentHashMap<>();
         ArrayList<BlockAndItemSerializable> list = tools.containsKey(registryName) ? tools.get(registryName) : new ArrayList<>();
-        list.add(tool);
-        tools.put(registryName, list);
+        tools.put(registryName, checkHas(list, tool));
         return self();
     }
     public BlockAndItems block(String registryName, BlockAndItemSerializable block) {
         if (this.blocks == null) this.blocks = new ConcurrentHashMap<>();
         ArrayList<BlockAndItemSerializable> list = blocks.containsKey(registryName) ? blocks.get(registryName) : new ArrayList<>();
-        list.add(block);
-        blocks.put(registryName, list);
+        blocks.put(registryName, checkHas(list, block));
         return self();
     }
 
     public BlockAndItems food(String registryName, BlockAndItemSerializable food) {
         if (this.foods == null) foods = new ConcurrentHashMap<>();
         ArrayList<BlockAndItemSerializable> list = foods.containsKey(registryName) ? foods.get(registryName) : new ArrayList<>();
-        list.add(food);
-        foods.put(registryName, list);
+        foods.put(registryName, checkHas(list, food));
         return self();
     }
 
+    public BlockAndItems spawnEgg(String registryName, BlockAndItemSerializable spawnEgg) {
+        if (this.spawnEggs == null) spawnEggs = new ConcurrentHashMap<>();
+        ArrayList<BlockAndItemSerializable> list = spawnEggs.containsKey(registryName) ? spawnEggs.get(registryName) : new ArrayList<>();
+
+        spawnEggs.put(registryName, checkHas(list, spawnEgg));
+        return self();
+    }
+
+    public ArrayList<BlockAndItemSerializable> checkHas(ArrayList<BlockAndItemSerializable> list,
+                                                        BlockAndItemSerializable serializable) {
+        for (BlockAndItemSerializable blockAndItemSerializable : list) {
+            if (blockAndItemSerializable.equals(serializable)) {
+                return list;
+            }
+        }
+        list.add(serializable);
+        return list;
+    }
 
     public BlockAndItemSerializable find(String registerName) {
         for (Field declaredField : this.getClass().getDeclaredFields()) {

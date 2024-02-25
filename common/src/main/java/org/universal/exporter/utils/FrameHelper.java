@@ -23,6 +23,7 @@ import org.uniexporter.exporter.adapter.utils.IFrameHelper;
 import java.io.IOException;
 import java.util.Base64;
 
+@Deprecated
 public class FrameHelper implements IFrameHelper<NativeImage, ItemStack, BakedModel, ItemRenderer> {
     public final Framebuffer fbo;
     private MatrixStack matrixStack;

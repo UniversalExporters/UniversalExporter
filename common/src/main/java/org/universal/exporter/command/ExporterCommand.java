@@ -8,47 +8,30 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.advancement.Advancement;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.item.*;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import org.uniexporter.exporter.adapter.serializable.Advancements;
-import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
-import org.uniexporter.exporter.adapter.serializable.BlockAndItems;
-import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ArmorType;
-import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ItemType;
-import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.NbtType;
 import org.universal.exporter.UniExporterExpectPlatform;
 import org.universal.exporter.command.argument.ExporterArgumentType;
 import org.universal.exporter.command.argument.ModidArgumentType;
 import org.universal.exporter.command.type.ExporterType;
 import org.universal.exporter.command.type.ModidType;
-import org.universal.exporter.utils.AdvancementHelper;
 import org.universal.exporter.utils.CommandHelper;
 import org.universal.exporter.utils.ExporterHelper;
-import org.universal.exporter.utils.FrameHelper;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Supplier;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
-import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.NbtType.nbtType;
-import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ToolType.toolType;
 import static org.universal.exporter.command.argument.ExporterArgumentType.getExporter;
 import static org.universal.exporter.command.argument.ModidArgumentType.getModidType;
-import static org.universal.exporter.utils.ItemAndBlockUtils.defaultItemProperties;
 
 /**
  * uex exporter command
@@ -132,19 +115,15 @@ public class ExporterCommand extends CommandHelper implements Serializable {
     }
 
     public int all() {
-        try {
-            if (this$select == null) {
+        if (this$select == null) {
+            itemAndBlockExporterAll();
+            advancementsAll();
+        } else {
+            if (this$select.equals(ExporterType.itemandblock)) {
                 itemAndBlockExporterAll();
+            } else if (this.this$select.equals(ExporterType.advancements)) {
                 advancementsAll();
-            } else {
-                if (this$select.equals(ExporterType.itemandblock)) {
-                    itemAndBlockExporterAll();
-                } else if (this.this$select.equals(ExporterType.advancements)) {
-                    advancementsAll();
-                }
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
         }
 
         return defaultCommandSources();
@@ -157,7 +136,7 @@ public class ExporterCommand extends CommandHelper implements Serializable {
 
         Advancements modidAdvancements = new Advancements();
         advancements.stream().filter(advancement -> advancement.getParent() == null).forEachOrdered(parent -> {
-            new AdvancementHelper(parent.getId().toString(), this$advanceParameters).advancementSet(parent, modidAdvancements);
+
         });
 
         subAdvancementSet(modidAdvancements, advancements);
@@ -170,7 +149,7 @@ public class ExporterCommand extends CommandHelper implements Serializable {
                     .filter(advancement -> advancement.getParent() != null && advancement.getParent().getId().toString().equals(registerName))
                     .forEachOrdered(subAdvancement -> {
                         serializable.children(advancements1 -> {
-                            new AdvancementHelper(subAdvancement.getId().toString(), this$advanceParameters).advancementSet(subAdvancement, modidAdvancements);
+
                         });
                         subAdvancementSet(serializable.children, advancements);
                     });
@@ -189,13 +168,8 @@ public class ExporterCommand extends CommandHelper implements Serializable {
     }
     //优先级 流体>方块>桶>盔甲>工具>食物>普通物品
     public void itemAndBlockExporterModid(String modid) {
-
-        BlockAndItems blockAndItems = new BlockAndItems();
-        Path itemAndBlocksJson = exporter.resolve(modid).resolve("item-and-block.json");
         ExporterHelper exporterHelper = new ExporterHelper(modid, this$advanceParameters, context);
         exporterHelper.itemExporter();
-
-        blockAndItems.save(itemAndBlocksJson);
     }
 
     /**
@@ -205,7 +179,9 @@ public class ExporterCommand extends CommandHelper implements Serializable {
         if (this$modid != null) {
             itemAndBlockExporterModid(this$modid.asString());
         } else {
-            Arrays.stream(ModidType.values()).map(ModidType::name).forEach(this::itemAndBlockExporterModid);
+            for (ModidType modidType : ModidType.values()) {
+                itemAndBlockExporterModid(modidType.name());
+            }
         }
     }
 

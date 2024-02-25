@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import org.uniexporter.exporter.adapter.annotations.AdvancementParameters;
 import org.uniexporter.exporter.adapter.faces.Self;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -13,15 +14,15 @@ public class BlockType implements Self<BlockType> {
     @SerializedName("hasSidedTransparency")
     public boolean hasSidedTransparency;//block state
     @SerializedName("isAir")
-    public boolean isAir;//block state
+    public Boolean isAir;//block state
     @SerializedName("burnable")
-    public boolean burnable;//block state
+    public Boolean burnable;//block state
     @SerializedName("liquid")
     @Deprecated
-    public boolean liquid;//block state
+    public Boolean liquid;//block state
     @SerializedName("solid")
     @Deprecated
-    public boolean solid;//block state
+    public Boolean solid;//block state
 
     @SerializedName("hardness")
     public float hardness;//block state
@@ -29,7 +30,7 @@ public class BlockType implements Self<BlockType> {
     @SerializedName("toolRequired")
     public boolean toolRequired;//block state
     @SerializedName("opaque")
-    public boolean opaque;//block state
+    public Boolean opaque;//block state
 
 
 
@@ -41,9 +42,9 @@ public class BlockType implements Self<BlockType> {
 //    public final Optional<Offsetter> offsetter; //block state
 //    public final Instrument instrument; //block state
     @SerializedName("blockBreakParticles")
-    public boolean blockBreakParticles;//block state
+    public Boolean blockBreakParticles;//block state
     @SerializedName("replaceable")
-    public boolean replaceable;//block state
+    public Boolean replaceable;//block state
 
 //    protected ShapeCache shapeCache; //block state
 //    public FluidState fluidState; //block state
@@ -51,25 +52,28 @@ public class BlockType implements Self<BlockType> {
     @SerializedName("resistance")
     public float resistance; // block settings
     @SerializedName("collidable")
-    public boolean collidable;  // block settings
+    public Boolean collidable;  // block settings
 
 //    BlockSoundGroup soundGroup;// block settings
 
     @SerializedName("randomTicks")
     public boolean randomTicks;// block settings
     @SerializedName("slipperiness")
-    public float slipperiness;// block settings
+    public Float slipperiness;// block settings
 
     @SerializedName("velocityMultiplier")
-    public float velocityMultiplier;// block settings
+    public Float velocityMultiplier;// block settings
     @SerializedName("jumpVelocityMultiplier")
-    public float jumpVelocityMultiplier;// block settings
+    public Float jumpVelocityMultiplier;// block settings
 
     @SerializedName("lootTableId")
     public String lootTableId;// block settings
 
     @SerializedName("asFluid")
     public FluidType asFluid;
+
+    @SerializedName("full")
+    public boolean isFull;
 
     public static BlockType blockType(Consumer<BlockType> consumer) {
         BlockType blockType = new BlockType();
@@ -95,5 +99,18 @@ public class BlockType implements Self<BlockType> {
     public BlockType asFluid(FluidType asFluid) {
         this.asFluid = asFluid;
         return self();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BlockType blockType = (BlockType) o;
+        return luminance == blockType.luminance && hasSidedTransparency == blockType.hasSidedTransparency && Float.compare(hardness, blockType.hardness) == 0 && toolRequired == blockType.toolRequired && Float.compare(resistance, blockType.resistance) == 0 && randomTicks == blockType.randomTicks && Objects.equals(isAir, blockType.isAir) && Objects.equals(burnable, blockType.burnable) && Objects.equals(liquid, blockType.liquid) && Objects.equals(solid, blockType.solid) && Objects.equals(opaque, blockType.opaque) && Objects.equals(blockBreakParticles, blockType.blockBreakParticles) && Objects.equals(replaceable, blockType.replaceable) && Objects.equals(collidable, blockType.collidable) && Objects.equals(slipperiness, blockType.slipperiness) && Objects.equals(velocityMultiplier, blockType.velocityMultiplier) && Objects.equals(jumpVelocityMultiplier, blockType.jumpVelocityMultiplier) && Objects.equals(lootTableId, blockType.lootTableId) && Objects.equals(asFluid, blockType.asFluid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(luminance, hasSidedTransparency, isAir, burnable, liquid, solid, hardness, toolRequired, opaque, blockBreakParticles, replaceable, resistance, collidable, randomTicks, slipperiness, velocityMultiplier, jumpVelocityMultiplier, lootTableId, asFluid);
     }
 }

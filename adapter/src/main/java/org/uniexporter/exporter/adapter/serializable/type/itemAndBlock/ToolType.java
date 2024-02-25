@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.Nullable;
 import org.uniexporter.exporter.adapter.faces.Self;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -31,5 +32,18 @@ public class ToolType implements Self<ToolType> {
         ToolType toolType = new ToolType();
         consumer.accept(toolType);
         return toolType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ToolType toolType = (ToolType) o;
+        return Float.compare(miningSpeed, toolType.miningSpeed) == 0 && Float.compare(miningLevel, toolType.miningLevel) == 0 && Float.compare(attackDamage, toolType.attackDamage) == 0 && enchantability == toolType.enchantability && Objects.equals(tagId, toolType.tagId) && Objects.equals(repairIngredients, toolType.repairIngredients);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tagId, miningSpeed, miningLevel, attackDamage, enchantability, repairIngredients);
     }
 }

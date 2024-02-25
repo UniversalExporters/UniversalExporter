@@ -9,8 +9,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class BlockAndItemSerializable extends NameType implements Self<BlockAndItemSerializable>, Serializable {
-    private static final long serialVersionUID = 2719619252545263537L;
+public class BlockAndItemSerializable extends NameType implements Self<BlockAndItemSerializable> {
 
     @SerializedName("type")
     public ItemType type;
@@ -20,8 +19,6 @@ public class BlockAndItemSerializable extends NameType implements Self<BlockAndI
         consumer.accept(serializable);
         return serializable;
     }
-
-
 
     public BlockAndItemSerializable name(String name) {
         this.name = name;
@@ -36,6 +33,11 @@ public class BlockAndItemSerializable extends NameType implements Self<BlockAndI
     public BlockAndItemSerializable type(ItemType type) {
         this.type = type;
         return self();
+    }
+
+    //计算处理完成后实行多线程(部分)
+    public void init(Runnable runnable) {
+        runnable.run();
     }
 
     @Override

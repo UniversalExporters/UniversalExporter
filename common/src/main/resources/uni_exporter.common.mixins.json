@@ -1,14 +1,14 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "org.universal.exporter.mixin",
+  "package": "org.universal.exporter.mixin.common",
   "compatibilityLevel": "JAVA_17",
   "client": [
     "MixinTitleScreen"
   ],
   "mixins": [
+    "MixinIdentifier",
     "MixinItemStack",
-    "MixinLanguage",
     "MixinMiningToolItem",
     "MixinModidType"
   ],

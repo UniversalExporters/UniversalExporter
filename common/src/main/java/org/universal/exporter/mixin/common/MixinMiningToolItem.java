@@ -1,4 +1,4 @@
-package org.universal.exporter.mixin;
+package org.universal.exporter.mixin.common;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;

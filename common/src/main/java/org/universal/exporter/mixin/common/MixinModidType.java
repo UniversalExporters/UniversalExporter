@@ -1,11 +1,8 @@
-package org.universal.exporter.mixin;
+package org.universal.exporter.mixin.common;
 
-import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.server.command.ServerCommandSource;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.universal.exporter.UniExporterExpectPlatform;
-import org.universal.exporter.command.type.ExporterType;
 import org.universal.exporter.command.type.ModidType;
 
 import java.util.Arrays;

@@ -21,4 +21,17 @@ public class NbtType {
         if (entries == null) entries = new ConcurrentHashMap<>();
         entries.put(key, entry);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NbtType nbtType = (NbtType) o;
+        return Objects.equals(entries, nbtType.entries);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entries);
+    }
 }
