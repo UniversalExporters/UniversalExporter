@@ -9,19 +9,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @SuppressWarnings("UnusedReturnValue")
-public class ToolType implements Self<ToolType> {
+public class ToolType extends ToolMaterialType implements Self<ToolType> {
     @SerializedName("tagId")
     public String tagId;
-    @SerializedName("miningSpeed")
-    public float miningSpeed;
-    @SerializedName("miningLevel")
-    public float miningLevel;
+
     @SerializedName("attackDamage")
     public float attackDamage;
-    @SerializedName("enchantability")
-    public int enchantability;
-    @SerializedName("repairIngredients")
-    public ConcurrentHashMap<String, NbtType> repairIngredients;
 
     public ToolType repairIngredient(String registerName, @Nullable NbtType nbt) {
         if (this.repairIngredients == null) this.repairIngredients = new ConcurrentHashMap<>();
@@ -37,13 +30,14 @@ public class ToolType implements Self<ToolType> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof ToolType)) return false;
+        if (!super.equals(o)) return false;
         ToolType toolType = (ToolType) o;
-        return Float.compare(miningSpeed, toolType.miningSpeed) == 0 && Float.compare(miningLevel, toolType.miningLevel) == 0 && Float.compare(attackDamage, toolType.attackDamage) == 0 && enchantability == toolType.enchantability && Objects.equals(tagId, toolType.tagId) && Objects.equals(repairIngredients, toolType.repairIngredients);
+        return Float.compare(attackDamage, toolType.attackDamage) == 0 && Objects.equals(tagId, toolType.tagId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tagId, miningSpeed, miningLevel, attackDamage, enchantability, repairIngredients);
+        return Objects.hash(super.hashCode(), tagId, attackDamage);
     }
 }
