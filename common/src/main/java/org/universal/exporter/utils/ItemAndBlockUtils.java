@@ -32,15 +32,15 @@ public class ItemAndBlockUtils {
                 List<Text> tooltip = stack.getTooltip(player, TooltipContext.BASIC);
                 for (Text text : tooltip) {
                     NameType basicTooltip = new NameType();
-                    basicTooltip.englishName = get(text, true);
-                    basicTooltip.name = get(text, false);
+                    basicTooltip.englishName = get(text, true, basicTooltip);
+                    basicTooltip.name = get(text, false, basicTooltip);
                     itemType.basicTooltip(basicTooltip);
                 }
                 List<Text> tooltip1 = stack.getTooltip(player, TooltipContext.ADVANCED);
                 for (Text text : tooltip1) {
                     NameType advanceToolTip = new NameType();
-                    advanceToolTip.englishName = get(text, true);
-                    advanceToolTip.name = get(text, false);
+                    advanceToolTip.englishName = get(text, true, advanceToolTip);
+                    advanceToolTip.name = get(text, false, advanceToolTip);
                     itemType.basicTooltip(advanceToolTip);
                 }
             }
@@ -52,8 +52,8 @@ public class ItemAndBlockUtils {
             if (group != null) {
                 Text displayName = group.getDisplayName();
                 itemType.tab = new NameType();
-                itemType.tab.englishName = get(displayName, true);
-                itemType.tab.name = get(displayName, false);
+                itemType.tab.englishName = get(displayName, true, itemType.tab);
+                itemType.tab.name = get(displayName, false, itemType.tab);
             }
             NbtCompound nbt = stack.getNbt();
             if (nbt != null) {
@@ -66,13 +66,15 @@ public class ItemAndBlockUtils {
 
     public static void setItemName(ItemStack stack, BlockAndItemSerializable blockAndItem) {
         String translationKey = stack.getTranslationKey();
+        blockAndItem.translateKey(translationKey);
         blockAndItem.englishName(SimpleLanguage.en_us.getOrNull(translationKey));
         blockAndItem.name(Language.getInstance().get(translationKey, null));
     }
 
-    public static String get(Text text, boolean isEnUs) {
+    public static String get(Text text, boolean isEnUs, NameType type) {
         TextContent content = text.getContent();
         if (content instanceof TranslatableTextContent key) {
+            type.translateKey(key.getKey());
             if (isEnUs) {
                 return SimpleLanguage.en_us.getOrNull(key.getKey());
             } else {
@@ -84,7 +86,7 @@ public class ItemAndBlockUtils {
         } else if (text instanceof MutableText mutableText) {
             StringBuilder sb = new StringBuilder();
             for (Text sibling : mutableText.getSiblings()) {
-                sb.append(get(sibling, isEnUs));
+                sb.append(get(sibling, isEnUs, type));
             }
             return sb.toString();
         }
