@@ -34,6 +34,7 @@ import java.util.Map;
 import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ArmorType.armorType;
 import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.BlockType.blockType;
 import static org.universal.exporter.utils.ItemAndBlockUtils.nbt;
+import static org.universal.exporter.utils.ItemAndBlockUtils.setItemName;
 
 public class ExporterHelper {
     private static final Path exporter = UniExporterExpectPlatform.getGameFolder().resolve("exporter");
@@ -114,7 +115,7 @@ public class ExporterHelper {
     public void checkPut(Identifier id, ItemStack stack, ItemGroup group) {
         Item item = stack.getItem();
         BlockAndItemSerializable serializable = new BlockAndItemSerializable();
-
+        setItemName(stack, serializable);
         initItem(stack, serializable, group);
         if (item instanceof BlockItem blockItem) {
             Block block = blockItem.getBlock();

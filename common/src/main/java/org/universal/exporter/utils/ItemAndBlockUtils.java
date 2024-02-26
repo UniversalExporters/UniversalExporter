@@ -27,10 +27,6 @@ public class ItemAndBlockUtils {
                                              ItemGroup group, CommandContext<ServerCommandSource> ctx, boolean advancement) {
         ServerPlayerEntity player = ctx.getSource().getPlayer();
 
-
-        String translationKey = stack.getTranslationKey();
-        blockAndItem.englishName(SimpleLanguage.en_us.getOrNull(translationKey));
-        blockAndItem.name(Language.getInstance().get(translationKey, null));
         blockAndItem.type = itemType(itemType -> {
             if (advancement) {
                 List<Text> tooltip = stack.getTooltip(player, TooltipContext.BASIC);
@@ -66,6 +62,12 @@ public class ItemAndBlockUtils {
             }
 
         });
+    }
+
+    public static void setItemName(ItemStack stack, BlockAndItemSerializable blockAndItem) {
+        String translationKey = stack.getTranslationKey();
+        blockAndItem.englishName(SimpleLanguage.en_us.getOrNull(translationKey));
+        blockAndItem.name(Language.getInstance().get(translationKey, null));
     }
 
     public static String get(Text text, boolean isEnUs) {
