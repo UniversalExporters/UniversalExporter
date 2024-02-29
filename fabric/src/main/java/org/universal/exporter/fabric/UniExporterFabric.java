@@ -14,8 +14,6 @@ public class UniExporterFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         UniExporter.init();
-        ArgumentTypeRegistry.registerArgumentType(new Identifier(UniExporter.MOD_ID, "exporter"), ExporterArgumentType.class, ConstantArgumentSerializer.of(ExporterArgumentType::exporter));
-        ArgumentTypeRegistry.registerArgumentType(new Identifier(UniExporter.MOD_ID, "modid"), ModidArgumentType.class, ConstantArgumentSerializer.of(ModidArgumentType::modids));
         CommandRegistrationCallback.EVENT.register(ExporterCommand::register);
 
     }
