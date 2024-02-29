@@ -8,6 +8,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.fluid.FlowableFluid;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.Ingredient;
@@ -16,19 +19,19 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Language;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EmptyBlockView;
 import org.jetbrains.annotations.NotNull;
 import org.uniexporter.exporter.adapter.faces.RepairIngredient;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
-import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ArmorType;
-import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.FoodType;
-import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.NbtType;
-import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.SpawnType;
+import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.*;
 import org.uniexporter.exporter.adapter.serializable.type.status.FactorCalculationDataType;
 import org.uniexporter.exporter.adapter.serializable.type.status.StatusEffectInstanceType;
 import org.uniexporter.exporter.adapter.serializable.type.status.StatusEffectType;
+import org.universal.exporter.serializable.Util;
 import org.universal.exporter.utils.ItemAndBlockUtils;
+import org.universal.exporter.utils.SimpleLanguage;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -61,14 +64,41 @@ public class ItemAndBlockHelper extends BasicHelper {
             checkPut(id, id.asStack(), null);
         }
     }
+
+    public void fluidRegistryBlockExporter() {
+        for (Identifier id : Registries.FLUID.getIds()) {
+           checkPutFluid(id);
+        }
+    }
+
+    public void checkPutFluid(Identifier id) {
+        if (!id.getNamespace().equals(modid)) return;
+        Fluid fluid = Registries.FLUID.get(id);
+        FluidState defaultState = fluid.getDefaultState();
+
+        BlockAndItemSerializable serializable = new BlockAndItemSerializable();
+        blockAndItems.fluid(id.toString(), serializable);
+        serializable.type = new ItemType();
+        initBlock(defaultState.getBlockState().getBlock(), serializable);
+        serializable.type.asBlock.asFluid = new FluidType();
+        serializable.type.asBlock.asFluid.asBucket = Registries.ITEM.getId(fluid.getBucketItem()).toString();
+        serializable.type.asBlock.asFluid.isSource = defaultState.isStill();
+        serializable.englishName = SimpleLanguage.en_us.get(defaultState.getBlockState().getBlock().getTranslationKey());
+        serializable.name = Language.getInstance().get(defaultState.getBlockState().getBlock().getTranslationKey());
+        if (fluid instanceof FlowableFluid flowableFluid) {
+            Util.fluidType(serializable.type.asBlock.asFluid, flowableFluid);
+        }
+    }
+
     //优先级 流体>方块>桶>盔甲>工具>刷怪蛋>食物>普通物品
     public void checkPut(Identifier id, ItemStack stack, ItemGroup group) {
+        if (!id.getNamespace().equals(modid)) return;
         Item item = stack.getItem();
         BlockAndItemSerializable serializable = new BlockAndItemSerializable();
         setItemName(stack, serializable);
         initItem(stack, serializable, group);
         if (item instanceof BlockItem blockItem) {
-            initBlock(blockItem, serializable);
+            initBlock(blockItem.getBlock(), serializable);
             blockAndItems.block(id.toString(), serializable);
         } else if (item instanceof BucketItem bucketItem) {
             serializable.type.asFluid = Registries.FLUID.getId(bucketItem.fluid).toString();
@@ -187,8 +217,8 @@ public class ItemAndBlockHelper extends BasicHelper {
         }
     }
 
-    private void initBlock(BlockItem blockItem, BlockAndItemSerializable serializable) {
-        Block block = blockItem.getBlock();
+    private void initBlock(Block block, BlockAndItemSerializable serializable) {
+
         BlockState defaultState = block.getDefaultState();
         serializable.type.asBlock = blockType(blockType -> {
             blockType.luminance = defaultState.getLuminance();
@@ -222,6 +252,7 @@ public class ItemAndBlockHelper extends BasicHelper {
         itemGroupItemExporter();
         registryItemExporter();
         recipesItemExporter();
+        fluidRegistryBlockExporter();
         saveItemExporter();
     }
 
