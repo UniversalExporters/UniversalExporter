@@ -12,8 +12,10 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import org.uniexporter.exporter.adapter.serializable.Advancements;
+import org.universal.exporter.command.argument.AdvancementParamArgumentType;
 import org.universal.exporter.command.argument.ExporterArgumentType;
 import org.universal.exporter.command.argument.ModidArgumentType;
+import org.universal.exporter.command.type.AdvancementParamType;
 import org.universal.exporter.command.type.ExporterType;
 import org.universal.exporter.command.type.ModidType;
 import org.universal.exporter.platform.Mod;
@@ -49,15 +51,30 @@ public class ExporterCommand extends CommandHelper implements Serializable {
     public static final  RequiredArgumentBuilder<ServerCommandSource, ExporterType> select = argument("select", ExporterArgumentType.exporter());
     public static final RequiredArgumentBuilder<ServerCommandSource, Boolean> advanceParameters = argument("advance-parameters", BoolArgumentType.bool());
     public static final RequiredArgumentBuilder<ServerCommandSource, ModidType> modid = argument("modid", ModidArgumentType.modids());
+    public static final RequiredArgumentBuilder<ServerCommandSource, AdvancementParamType>  advancementParam = argument("params", AdvancementParamArgumentType.advancementParams());
 
     private final ExporterType this$select;
     private final Boolean this$advanceParameters;
     private static final Path exporter = Mod.getGameFolder().resolve("exporter");
+    private final AdvancementParamType[] types;
 
-    private ExporterCommand(CommandContext<ServerCommandSource> context, ExporterType select, ModidType modid, boolean advanceParameters) {
+    private ExporterCommand(CommandContext<ServerCommandSource> context, ExporterType select, ModidType modid, boolean advanceParameters, int paramCount) {
         super(modid, context);
         this$select = select;
         this$advanceParameters = advanceParameters;
+        types = new AdvancementParamType[paramCount];
+        for (int i = 0; i < paramCount; i++) {
+            types[i] = AdvancementParamArgumentType.getAdvancementParamType(context, "params_" + i);
+        }
+    }
+
+    public static RequiredArgumentBuilder<ServerCommandSource, AdvancementParamType> registerParams(boolean select, boolean modid, boolean advanceParameters, int i) {
+
+        if (i == AdvancementParamType.values().length - 1) {
+            return argument("params_" + i, AdvancementParamArgumentType.advancementParams()).executes(ctx -> getInstance(ctx, select, modid, advanceParameters, i + 1));
+        } else {
+            return argument("params_" + i, AdvancementParamArgumentType.advancementParams()).then(registerParams(select, modid, advanceParameters, i + 1));
+        }
     }
 
     /**
@@ -67,23 +84,46 @@ public class ExporterCommand extends CommandHelper implements Serializable {
      * @param env environment
      */
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment env) {
+
+
+
+
         dispatcher.register(
                 uex
-                        .executes(context ->getInstance(context, false, false, false))
+                        .executes(context ->getInstance(context, false, false, false, 0))
                         .then(
                                 modid
-                                        .executes(context -> getInstance(context, false, true, false))
-                                        .then(advanceParameters.executes(context -> getInstance(context, false, true, true)))
+                                        .executes(context -> getInstance(context, false, true, false, 0))
+                                        .then(
+                                                advanceParameters
+                                                        .executes(ctx -> getInstance(ctx,false, true, true, 0))
+                                                        .then(registerParams(false, true, true, 0))
+                                        )
+                        ).then(
+                                advanceParameters
+                                        .executes(ctx -> getInstance(ctx,false, false, true, 0))
+                                        .then(registerParams(false, false, true, 0))
                         )
-                        .then(advanceParameters.executes(context -> getInstance(context, false, false, true)))
                         .then(
                                 select
-                                        .executes(context -> getInstance(context, true, false, false))
-                                        .then(advanceParameters.executes(context -> getInstance(context, true, false, true)))
+                                        .executes(context -> getInstance(context, true, false, false, 0))
+                                        .then(
+                                                advanceParameters
+                                                        .executes(ctx -> getInstance(ctx,true, false, true, 0))
+                                                        .then(
+                                                                advanceParameters
+                                                                        .executes(ctx -> getInstance(ctx,true, false, true, 0))
+                                                                        .then(registerParams(true, false, true, 0))
+                                                        )
+                                        )
                                         .then(
                                                 modid
-                                                        .executes(context -> getInstance(context, true, true, false))
-                                                        .then(advanceParameters.executes(context -> getInstance(context, true, true, true)))
+                                                        .executes(context -> getInstance(context, true, true, false, 0))
+                                                        .then(
+                                                                advanceParameters
+                                                                        .executes(ctx -> getInstance(ctx,true, true, true, 0))
+                                                                        .then(registerParams(true, true, true, 0))
+                                                        )
                                         )
                         )
         );
@@ -99,8 +139,8 @@ public class ExporterCommand extends CommandHelper implements Serializable {
     // uex select advance-parameters √
     // uex select modid advance-parameters √
 
-    public static int getInstance(CommandContext<ServerCommandSource> context, boolean select, boolean modid, boolean advanceParameters) {
-        return new ExporterCommand(context, select ? getExporter(context, "select") : null, modid ? getModidType(context, "modid") : null, advanceParameters && BoolArgumentType.getBool(context, "advance-parameters")).all();
+    public static int getInstance(CommandContext<ServerCommandSource> context, boolean select, boolean modid, boolean advanceParameters, int paramCount) {
+        return new ExporterCommand(context, select ? getExporter(context, "select") : null, modid ? getModidType(context, "modid") : null, advanceParameters && BoolArgumentType.getBool(context, "advance-parameters"), paramCount).all();
     }
 
 
