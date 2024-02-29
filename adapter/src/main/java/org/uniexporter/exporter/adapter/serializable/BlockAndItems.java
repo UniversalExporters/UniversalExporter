@@ -26,6 +26,16 @@ public class BlockAndItems implements Save, Self<BlockAndItems> {
     @SerializedName("spawnEggs")
     public ConcurrentHashMap<String, ArrayList<BlockAndItemSerializable>> spawnEggs;
 
+    @SerializedName("fuels")
+    public ConcurrentHashMap<String, ArrayList<BlockAndItemSerializable>> fuels;
+
+
+    public BlockAndItems fuel(String registryName, BlockAndItemSerializable fuel) {
+        if (this.fuels == null) this.fuels = new ConcurrentHashMap<>();
+        ArrayList<BlockAndItemSerializable> list = fuels.containsKey(registryName) ? fuels.get(registryName) : new ArrayList<>();
+        this.fuels.put(registryName, checkHas(list, fuel));
+        return self();
+    }
 
     public BlockAndItems bucket(String registryName, BlockAndItemSerializable bucket) {
         if (this.buckets == null) this.buckets = new ConcurrentHashMap<>();

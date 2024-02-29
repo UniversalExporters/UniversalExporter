@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -90,37 +91,47 @@ public class ItemAndBlockHelper extends BasicHelper {
         }
     }
 
-    //优先级 流体>方块>桶>盔甲>工具>刷怪蛋>食物>普通物品
+    //优先级 流体>方块>桶>盔甲>工具>刷怪蛋>食物>燃料>普通物品
     public void checkPut(Identifier id, ItemStack stack, ItemGroup group) {
         if (!id.getNamespace().equals(modid)) return;
         Item item = stack.getItem();
         BlockAndItemSerializable serializable = new BlockAndItemSerializable();
         setItemName(stack, serializable);
         initItem(stack, serializable, group);
-        if (item instanceof BlockItem blockItem) {
-            initBlock(blockItem.getBlock(), serializable);
-            blockAndItems.block(id.toString(), serializable);
-        } else if (item instanceof BucketItem bucketItem) {
-            serializable.type.asFluid = Registries.FLUID.getId(bucketItem.fluid).toString();
-            blockAndItems.bucket(id.toString(), serializable);
-        } else if (item instanceof ArmorItem armorItem) {
-            initArmor(armorItem, serializable);
-            blockAndItems.armor(id.toString(), serializable);
-        } else if (item instanceof ToolItem toolItem) {
-            initToolItem(toolItem, serializable);
-            blockAndItems.tool(id.toString(), serializable);
-        } else if (item instanceof SpawnEggItem spawnEggItem) {
-            initSpawnEggItem(spawnEggItem, serializable);
-            blockAndItems.spawnEgg(id.toString(), serializable);
+        initFoodSettings(serializable, item);
+        initBlock(item instanceof BlockItem blockItem ? blockItem.getBlock() : null, serializable);
+        initBucketItem(item instanceof BucketItem bucketItem ? bucketItem : null, serializable);
+        initArmor(item instanceof ArmorItem armorItem ? armorItem : null, serializable);
+        initToolItem(item instanceof ToolItem toolItem ? toolItem : null, serializable);
+        serializable.type.fuelTime = FurnaceBlockEntity.createFuelTimeMap().get(item);
+        initSpawnEggItem(item instanceof SpawnEggItem spawnEggItem ?spawnEggItem : null, serializable);
+        String registryName = id.toString();
+        if (item instanceof BlockItem) {
+            blockAndItems.block(registryName, serializable);
+        } else if (item instanceof BucketItem) {
+            blockAndItems.bucket(registryName, serializable);
+        } else if (item instanceof ArmorItem) {
+            blockAndItems.armor(registryName, serializable);
+        } else if (item instanceof ToolItem) {
+            blockAndItems.tool(registryName, serializable);
+        } else if (item instanceof SpawnEggItem) {
+            blockAndItems.spawnEgg(registryName, serializable);
         } else if (item.isFood()) {
-            initFoodSettings(serializable, item);
-            blockAndItems.food(id.toString(), serializable);
+            blockAndItems.food(registryName, serializable);
+        } else if (serializable.type.fuelTime > 0) {
+            blockAndItems.fuel(registryName, serializable);
         } else {
-            blockAndItems.item(id.toString(), serializable);
+            blockAndItems.item(registryName, serializable);
         }
     }
 
+    private void initBucketItem(BucketItem bucketItem, BlockAndItemSerializable serializable) {
+        if (bucketItem == null) return;
+        serializable.type.asFluid(Registries.FLUID.getId(bucketItem.fluid).toString());
+    }
+
     private void initFoodSettings(BlockAndItemSerializable serializable, Item item) {
+        if (!item.isFood()) return;
         serializable.type.asFood = new FoodType();
         FoodComponent foodComponent = item.getFoodComponent();
         assert foodComponent != null;
@@ -167,6 +178,7 @@ public class ItemAndBlockHelper extends BasicHelper {
     }
 
     private void initSpawnEggItem(SpawnEggItem spawnEggItem, BlockAndItemSerializable serializable) {
+        if (spawnEggItem == null) return;
         serializable.type.asEgg = new SpawnType();
         serializable.type.asEgg.primaryColor = spawnEggItem.getColor(0);
         serializable.type.asEgg.secondaryColor = spawnEggItem.getColor(1);
@@ -174,6 +186,7 @@ public class ItemAndBlockHelper extends BasicHelper {
     }
 
     private void initToolItem(ToolItem toolItem, BlockAndItemSerializable serializable) {
+        if (toolItem == null) return;
         serializable.type.tool = toolType(toolType -> {
             toolType.miningLevel = toolItem.getMaterial().getMiningLevel();
             toolType.miningSpeed = toolItem.getMaterial().getMiningSpeedMultiplier();
@@ -195,6 +208,7 @@ public class ItemAndBlockHelper extends BasicHelper {
     }
 
     private void initArmor(ArmorItem armorItem, BlockAndItemSerializable serializable) {
+        if (armorItem == null) return;
         serializable.type.armor = armorType(armorType -> {
             armorType.type = armorItem.getType().getName();
             armorType.equipmentSlot = armorItem.getType().getEquipmentSlot().getName();
@@ -218,7 +232,7 @@ public class ItemAndBlockHelper extends BasicHelper {
     }
 
     private void initBlock(Block block, BlockAndItemSerializable serializable) {
-
+        if (block == null) return;
         BlockState defaultState = block.getDefaultState();
         serializable.type.asBlock = blockType(blockType -> {
             blockType.luminance = defaultState.getLuminance();
