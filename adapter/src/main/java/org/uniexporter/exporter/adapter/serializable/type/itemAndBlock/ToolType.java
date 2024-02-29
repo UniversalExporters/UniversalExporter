@@ -2,6 +2,7 @@ package org.uniexporter.exporter.adapter.serializable.type.itemAndBlock;
 
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.Nullable;
+import org.uniexporter.exporter.adapter.faces.RepairIngredient;
 import org.uniexporter.exporter.adapter.faces.Self;
 
 import java.util.Objects;
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @SuppressWarnings("UnusedReturnValue")
-public class ToolType extends ToolMaterialType implements Self<ToolType> {
+public class ToolType extends ToolMaterialType implements Self<ToolType>, RepairIngredient<ToolType> {
     @SerializedName("tagId")
     public String tagId;
 

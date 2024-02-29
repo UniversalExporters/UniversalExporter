@@ -12,11 +12,11 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import org.uniexporter.exporter.adapter.serializable.Advancements;
-import org.universal.exporter.UniExporterExpectPlatform;
 import org.universal.exporter.command.argument.ExporterArgumentType;
 import org.universal.exporter.command.argument.ModidArgumentType;
 import org.universal.exporter.command.type.ExporterType;
 import org.universal.exporter.command.type.ModidType;
+import org.universal.exporter.platform.Mod;
 import org.universal.exporter.utils.CommandHelper;
 import org.universal.exporter.utils.ExporterHelper;
 
@@ -52,7 +52,7 @@ public class ExporterCommand extends CommandHelper implements Serializable {
 
     private final ExporterType this$select;
     private final Boolean this$advanceParameters;
-    private static final Path exporter = UniExporterExpectPlatform.getGameFolder().resolve("exporter");
+    private static final Path exporter = Mod.getGameFolder().resolve("exporter");
 
     private ExporterCommand(CommandContext<ServerCommandSource> context, ExporterType select, ModidType modid, boolean advanceParameters) {
         super(modid, context);

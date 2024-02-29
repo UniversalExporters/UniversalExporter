@@ -2,8 +2,8 @@ package org.universal.exporter.mixin.common;
 
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.gen.Invoker;
-import org.universal.exporter.UniExporterExpectPlatform;
 import org.universal.exporter.command.type.ModidType;
+import org.universal.exporter.platform.Mod;
 
 import java.util.Arrays;
 
@@ -21,7 +21,7 @@ public class MixinModidType {
     }
 
     static {
-        UniExporterExpectPlatform.getModids().forEach(MixinModidType::universal$exporter$create);
+        Mod.getModids().forEach(MixinModidType::universal$exporter$create);
     }
 
     @Unique

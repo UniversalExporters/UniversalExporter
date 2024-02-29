@@ -39,6 +39,9 @@ public class ItemType implements Self<ItemType> {
     @SerializedName("nbt")
     public NbtType nbt;
 
+    @SerializedName("asEgg")
+    public SpawnType asEgg;
+
     public static ItemType itemType(Consumer<ItemType> consumer) {
         ItemType itemType = new ItemType();
         consumer.accept(itemType);
@@ -114,11 +117,11 @@ public class ItemType implements Self<ItemType> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ItemType itemType = (ItemType) o;
-        return maxStackSize == itemType.maxStackSize && maxDurability == itemType.maxDurability && fuelTime == itemType.fuelTime && Objects.equals(OredictList, itemType.OredictList) && Objects.equals(icon, itemType.icon) && Objects.equals(asBlock, itemType.asBlock) && Objects.equals(asFluid, itemType.asFluid) && Objects.equals(maxUseTime, itemType.maxUseTime) && Objects.equals(asFood, itemType.asFood) && Objects.equals(tool, itemType.tool) && Objects.equals(armor, itemType.armor) && Objects.equals(nbt, itemType.nbt) && Objects.equals(rarity, itemType.rarity) && Objects.equals(type, itemType.type);
+        return maxStackSize == itemType.maxStackSize && maxDurability == itemType.maxDurability && fuelTime == itemType.fuelTime && Objects.equals(OredictList, itemType.OredictList) && Objects.equals(icon, itemType.icon) && Objects.equals(asBlock, itemType.asBlock) && Objects.equals(asFluid, itemType.asFluid) && Objects.equals(maxUseTime, itemType.maxUseTime) && Objects.equals(asFood, itemType.asFood) && Objects.equals(tool, itemType.tool) && Objects.equals(armor, itemType.armor) && Objects.equals(nbt, itemType.nbt) && Objects.equals(asEgg, itemType.asEgg) && Objects.equals(rarity, itemType.rarity) && Objects.equals(type, itemType.type) && Objects.equals(basicTooltips, itemType.basicTooltips) && Objects.equals(advanceTooltips, itemType.advanceTooltips);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(maxStackSize, maxDurability, OredictList, icon, asBlock, asFluid, maxUseTime, asFood, tool, armor, fuelTime, nbt, rarity, type);
+        return Objects.hash(maxStackSize, maxDurability, OredictList, icon, asBlock, asFluid, maxUseTime, asFood, tool, armor, fuelTime, nbt, asEgg, rarity, type, basicTooltips, advanceTooltips);
     }
 }

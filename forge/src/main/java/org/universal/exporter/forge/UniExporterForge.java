@@ -24,6 +24,7 @@ import org.universal.exporter.command.ExporterCommand;
 import org.universal.exporter.command.argument.ExporterArgumentType;
 import org.universal.exporter.command.argument.ModidArgumentType;
 import org.universal.exporter.registry.CommandListening;
+import org.universal.exporter.registry.forge.RegistryAllImpl;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -45,7 +46,7 @@ public class UniExporterForge {
 
     @SubscribeEvent
     public void registry(RegisterEvent event) {
-        for (Map.Entry<Identifier, Supplier<ArgumentSerializer<?, ?>>> entry : UniExporterExpectPlatformImpl.arguments.entrySet()) {
+        for (Map.Entry<Identifier, Supplier<ArgumentSerializer<?, ?>>> entry : RegistryAllImpl.arguments.entrySet()) {
             Identifier id = entry.getKey();
             Supplier<ArgumentSerializer<?, ?>> supplier = entry.getValue();
             event.register(RegistryKeys.COMMAND_ARGUMENT_TYPE, id, supplier);
@@ -55,7 +56,7 @@ public class UniExporterForge {
 
     @SubscribeEvent
     public void registerCommands(RegisterCommandsEvent event) {
-        for (CommandListening listen : UniExporterExpectPlatformImpl.listens) {
+        for (CommandListening listen : RegistryAllImpl.listens) {
             listen.register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
         }
     }

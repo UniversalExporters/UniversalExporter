@@ -2,13 +2,14 @@ package org.uniexporter.exporter.adapter.serializable.type.itemAndBlock;
 
 import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.Nullable;
+import org.uniexporter.exporter.adapter.faces.RepairIngredient;
 import org.uniexporter.exporter.adapter.faces.Self;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-public class ArmorType implements Self<ArmorType> {
+public class ArmorType implements Self<ArmorType>, RepairIngredient<ArmorType> {
     @SerializedName("type")
     public String type;
     @SerializedName("equipmentSlot")
@@ -25,10 +26,7 @@ public class ArmorType implements Self<ArmorType> {
     @SerializedName("repairIngredients")
     public ConcurrentHashMap<String, NbtType> repairIngredients;
 
-    public ArmorType repairIngredient(String registerName, @Nullable NbtType nbt) {
-        if (this.repairIngredients == null) this.repairIngredients = new ConcurrentHashMap<>();
-        return self();
-    }
+
 
     public static ArmorType armorType(Consumer<ArmorType> consumer) {
         ArmorType armorType = new ArmorType();
@@ -47,5 +45,11 @@ public class ArmorType implements Self<ArmorType> {
     @Override
     public int hashCode() {
         return Objects.hash(type, equipmentSlot, enchantability, protection, toughness, knockbackResistance, repairIngredients);
+    }
+
+    @Override
+    public ArmorType repairIngredient(String registerName, @Nullable NbtType nbt) {
+        if (this.repairIngredients == null) this.repairIngredients = new ConcurrentHashMap<>();
+        return self();
     }
 }

@@ -27,7 +27,7 @@ accessible field net/minecraft/item/MiningToolItem miningSpeed F
 accessible field net/minecraft/item/ItemGroups HOTBAR Lnet/minecraft/registry/RegistryKey;
 accessible field net/minecraft/item/ItemGroups INVENTORY Lnet/minecraft/registry/RegistryKey;
 accessible field net/minecraft/item/ItemGroups SEARCH Lnet/minecraft/registry/RegistryKey;
-
+accessible field net/minecraft/item/SpawnEggItem type Lnet/minecraft/entity/EntityType;
 
 
 
