@@ -208,8 +208,9 @@ public class ExporterCommand extends CommandHelper implements Serializable {
     }
     //优先级 流体>方块>桶>盔甲>工具>食物>普通物品
     public void itemAndBlockExporterModid(String modid) {
-        ExporterHelper exporterHelper = new ExporterHelper(modid, this$advanceParameters, context);
+        ExporterHelper exporterHelper = new ExporterHelper(modid, this$advanceParameters, context, types);
         exporterHelper.itemExporter();
+
     }
 
     /**

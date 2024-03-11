@@ -39,7 +39,6 @@ public class FrameHelper implements IFrameHelper<NativeImage, ItemStack, BakedMo
     }
 
     public static Pair<FrameHelper, FrameHelper> of(ItemStack stack) {
-
         return new Pair<>(new FrameHelper(32, stack), new FrameHelper(128, stack));
     }
 

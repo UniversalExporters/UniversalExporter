@@ -25,54 +25,6 @@ import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.It
 
 
 public class ItemAndBlockUtils {
-    public static void defaultItemProperties(ItemStack stack,
-                                             BlockAndItemSerializable blockAndItem,
-                                             ItemGroup group, CommandContext<ServerCommandSource> ctx, boolean advancement) {
-        ServerPlayerEntity player = ctx.getSource().getPlayer();
-
-        blockAndItem.type = itemType(itemType -> {
-            tooltipSet(stack, advancement, itemType, player);
-            itemType.maxStackSize = stack.getItem().getMaxCount();
-            itemType.maxDurability = stack.getItem().getMaxDamage();
-            stack.streamTags().forEach(itemTagKey -> {
-                itemType.OredictList(itemTagKey.id().toString());
-            });
-            groupSet(group, itemType);
-            NbtCompound nbt = stack.getNbt();
-            if (nbt != null) {
-                itemType.nbt = new NbtType();
-                nbt(nbt, itemType.nbt);
-            }
-        });
-    }
-
-    private static void groupSet(ItemGroup group, ItemType itemType) {
-        if (group != null) {
-            Text displayName = group.getDisplayName();
-            itemType.tab = new NameType();
-            itemType.tab.englishName = get(displayName, true, itemType.tab);
-            itemType.tab.name = get(displayName, false, itemType.tab);
-        }
-    }
-
-    private static void tooltipSet(ItemStack stack, boolean advancement, ItemType itemType, ServerPlayerEntity player) {
-        if (advancement) {
-            List<Text> tooltip = stack.getTooltip(player, TooltipContext.BASIC);
-            tooltip.forEach(text -> {
-                NameType basicTooltip = new NameType();
-                basicTooltip.englishName = get(text, true, basicTooltip);
-                basicTooltip.name = get(text, false, basicTooltip);
-                itemType.basicTooltip(basicTooltip);
-            });
-            List<Text> tooltip1 = stack.getTooltip(player, TooltipContext.ADVANCED);
-            tooltip1.forEach(text -> {
-                NameType advanceToolTip = new NameType();
-                advanceToolTip.englishName = get(text, true, advanceToolTip);
-                advanceToolTip.name = get(text, false, advanceToolTip);
-                itemType.basicTooltip(advanceToolTip);
-            });
-        }
-    }
 
     public static void setItemName(ItemStack stack, BlockAndItemSerializable blockAndItem) {
         String translationKey = stack.getTranslationKey();

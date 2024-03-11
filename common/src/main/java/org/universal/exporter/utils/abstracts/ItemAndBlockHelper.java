@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.FurnaceBlockEntity;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.fluid.FlowableFluid;
@@ -19,6 +20,8 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Language;
 import net.minecraft.util.math.BlockPos;
@@ -26,31 +29,39 @@ import net.minecraft.world.EmptyBlockView;
 import org.jetbrains.annotations.NotNull;
 import org.uniexporter.exporter.adapter.faces.RepairIngredient;
 import org.uniexporter.exporter.adapter.serializable.BlockAndItemSerializable;
+import org.uniexporter.exporter.adapter.serializable.type.NameType;
 import org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.*;
 import org.uniexporter.exporter.adapter.serializable.type.status.FactorCalculationDataType;
 import org.uniexporter.exporter.adapter.serializable.type.status.StatusEffectInstanceType;
 import org.uniexporter.exporter.adapter.serializable.type.status.StatusEffectType;
+import org.universal.exporter.command.type.AdvancementParamType;
 import org.universal.exporter.serializable.Util;
-import org.universal.exporter.utils.ItemAndBlockUtils;
 import org.universal.exporter.utils.SimpleLanguage;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ArmorType.armorType;
 import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.BlockType.blockType;
+import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ItemType.itemType;
 import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ToolType.toolType;
-import static org.universal.exporter.utils.ItemAndBlockUtils.nbt;
-import static org.universal.exporter.utils.ItemAndBlockUtils.setItemName;
+import static org.universal.exporter.utils.ItemAndBlockUtils.*;
 
 public class ItemAndBlockHelper extends BasicHelper {
     private final Path itemAndBlockExporter;
     private final ArrayList<ItemGroup> groups = new ArrayList<>();
+    public final AtomicBoolean hasTypes = new AtomicBoolean();
 
-    public ItemAndBlockHelper(String modid, boolean advancement, CommandContext<ServerCommandSource> ctx) {
-        super(modid, advancement, ctx);
+    public ItemAndBlockHelper(String modid, boolean advancement, CommandContext<ServerCommandSource> ctx, AdvancementParamType... types) {
+        super(modid, advancement, ctx, types);
         itemAndBlockExporter = modidDir.resolve("item-and-block.json");
+        for (AdvancementParamType ignored : types) {
+            //判断默认实现如果不带参数则使用默认实现
+            hasTypes.set(true);
+        }
     }
 
     public void saveItemExporter() {
@@ -140,13 +151,18 @@ public class ItemAndBlockHelper extends BasicHelper {
         serializable.type.asFood.meat = foodComponent.isMeat();
         serializable.type.asFood.alwaysEdible = foodComponent.isAlwaysEdible();
         serializable.type.asFood.snack = foodComponent.isSnack();
-        if (advancement) {
-            for (Pair<StatusEffectInstance, Float> statusEffect : foodComponent.statusEffects) {
-                StatusEffectInstance first = statusEffect.getFirst();
-                StatusEffectInstanceType type = statusEffectInstanceInit(first);
-                serializable.type.asFood.statusEffects(type, statusEffect.getSecond());
-            }
+        if (!advancement)
+            return;
+
+        if (!types.contains(AdvancementParamType.status_effects_food) || hasTypes.get())
+            return;
+
+        for (Pair<StatusEffectInstance, Float> statusEffect : foodComponent.statusEffects) {
+            StatusEffectInstance first = statusEffect.getFirst();
+            StatusEffectInstanceType type = statusEffectInstanceInit(first);
+            serializable.type.asFood.statusEffects(type, statusEffect.getSecond());
         }
+
     }
 
     @NotNull
@@ -238,27 +254,46 @@ public class ItemAndBlockHelper extends BasicHelper {
             blockType.luminance = defaultState.getLuminance();
             blockType.isFull = Block.isShapeFullCube(defaultState.getCollisionShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN));
 
-            if (advancement) {
-                blockType.hasSidedTransparency = defaultState.hasSidedTransparency();
-                blockType.isAir = defaultState.isAir();
-                blockType.liquid = defaultState.isLiquid();
-                blockType.solid = defaultState.isSolid();
-                blockType.opaque = defaultState.isOpaque();
-                blockType.blockBreakParticles = defaultState.isOpaque();
-                blockType.replaceable = defaultState.isOpaque();
-                blockType.burnable = defaultState.isBurnable();
-                blockType.slipperiness = block.getSlipperiness();
-                blockType.velocityMultiplier = block.getVelocityMultiplier();
-                blockType.jumpVelocityMultiplier = block.getJumpVelocityMultiplier();
-                blockType.collidable = block.collidable;
-            }
-
             blockType.hardness = defaultState.getHardness(null, null);
             blockType.toolRequired = defaultState.isToolRequired();
             blockType.resistance = block.getBlastResistance();
 
             blockType.randomTicks = defaultState.hasRandomTicks();
             blockType.lootTableId = block.getLootTableId().toString();
+            if (!advancement)
+                return;
+            if (types.contains(AdvancementParamType.has_sided_transparency_block) || !hasTypes.get()) {
+                blockType.hasSidedTransparency = defaultState.hasSidedTransparency();
+            }
+            if (types.contains(AdvancementParamType.block_level_1) || !hasTypes.get()) {
+                //空气 透明度 可被其他方块替换(草) 可燃 光滑度
+                blockType.isAir = defaultState.isAir();
+                blockType.opaque = defaultState.isOpaque();
+                blockType.replaceable = defaultState.isReplaceable();
+                blockType.burnable = defaultState.isBurnable();
+                blockType.slipperiness = block.getSlipperiness();
+            }
+            if (types.contains(AdvancementParamType.block_level_2) || !hasTypes.get()) {
+                //起跳性质，速度性质
+                blockType.velocityMultiplier = block.getVelocityMultiplier();
+                blockType.jumpVelocityMultiplier = block.getJumpVelocityMultiplier();
+            }
+            if (types.contains(AdvancementParamType.block_level_3) || !hasTypes.get()) {
+                blockType.collidable = block.collidable;
+            }
+            if (types.contains(AdvancementParamType.block_level_4) || !hasTypes.get()) {
+                //第四序列,弃用方法的高级导出
+                blockType.liquid = defaultState.isLiquid();
+                blockType.solid = defaultState.isSolid();
+
+            }
+
+            blockType.blockBreakParticles = defaultState.hasBlockBreakParticles();
+
+
+
+
+
         });
     }
 
@@ -300,9 +335,64 @@ public class ItemAndBlockHelper extends BasicHelper {
     }
 
     public void initItem(ItemStack stack, BlockAndItemSerializable serializable, ItemGroup group) {
-        ItemAndBlockUtils.defaultItemProperties(stack, serializable, group, ctx, advancement);
+        defaultItemProperties(stack, serializable, group, ctx, advancement);
 //        ItemAndBlockUtils.tabPut(group, serializable);
 
+    }
+
+    public void defaultItemProperties(ItemStack stack,
+                                             BlockAndItemSerializable blockAndItem,
+                                             ItemGroup group, CommandContext<ServerCommandSource> ctx, boolean advancement) {
+        ServerPlayerEntity player = ctx.getSource().getPlayer();
+
+        blockAndItem.type = itemType(itemType -> {
+            tooltipSet(stack, advancement, itemType, player);
+            itemType.maxStackSize = stack.getItem().getMaxCount();
+            itemType.maxDurability = stack.getItem().getMaxDamage();
+            stack.streamTags().forEach(itemTagKey -> {
+                itemType.OredictList(itemTagKey.id().toString());
+            });
+            groupSet(group, itemType);
+            NbtCompound nbt = stack.getNbt();
+            if (nbt != null) {
+                itemType.nbt = new NbtType();
+                nbt(nbt, itemType.nbt);
+            }
+        });
+    }
+
+    private void groupSet(ItemGroup group, ItemType itemType) {
+        if (group != null) {
+            Text displayName = group.getDisplayName();
+            itemType.tab = new NameType();
+            itemType.tab.englishName = get(displayName, true, itemType.tab);
+            itemType.tab.name = get(displayName, false, itemType.tab);
+        }
+    }
+
+    private void tooltipSet(ItemStack stack, boolean advancement, ItemType itemType, ServerPlayerEntity player) {
+        if (!advancement) {
+            return;
+        }
+        if (types.contains(AdvancementParamType.basic_tooltip) || !hasTypes.get()) {
+            List<Text> basic = stack.getTooltip(player, TooltipContext.BASIC);
+
+            basic.forEach(text -> {
+                NameType basicTooltip = new NameType();
+                basicTooltip.englishName = get(text, true, basicTooltip);
+                basicTooltip.name = get(text, false, basicTooltip);
+                itemType.basicTooltip(basicTooltip);
+            });
+        }
+        if (types.contains(AdvancementParamType.advance_tooltip) || !hasTypes.get()) {
+            List<Text> tooltip1 = stack.getTooltip(player, TooltipContext.ADVANCED);
+            tooltip1.forEach(text -> {
+                NameType advanceToolTip = new NameType();
+                advanceToolTip.englishName = get(text, true, advanceToolTip);
+                advanceToolTip.name = get(text, false, advanceToolTip);
+                itemType.basicTooltip(advanceToolTip);
+            });
+        }
     }
 
     public ArrayList<ItemGroup> getGroups() {
