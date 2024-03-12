@@ -42,7 +42,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.ArmorType.armorType;
 import static org.uniexporter.exporter.adapter.serializable.type.itemAndBlock.BlockType.blockType;
@@ -53,15 +52,11 @@ import static org.universal.exporter.utils.ItemAndBlockUtils.*;
 public class ItemAndBlockHelper extends BasicHelper {
     private final Path itemAndBlockExporter;
     private final ArrayList<ItemGroup> groups = new ArrayList<>();
-    public final AtomicBoolean hasTypes = new AtomicBoolean();
 
     public ItemAndBlockHelper(String modid, boolean advancement, CommandContext<ServerCommandSource> ctx, AdvancementParamType... types) {
         super(modid, advancement, ctx, types);
         itemAndBlockExporter = modidDir.resolve("item-and-block.json");
-        for (AdvancementParamType ignored : types) {
-            //判断默认实现如果不带参数则使用默认实现
-            hasTypes.set(true);
-        }
+
     }
 
     public void saveItemExporter() {
@@ -151,17 +146,15 @@ public class ItemAndBlockHelper extends BasicHelper {
         serializable.type.asFood.meat = foodComponent.isMeat();
         serializable.type.asFood.alwaysEdible = foodComponent.isAlwaysEdible();
         serializable.type.asFood.snack = foodComponent.isSnack();
-        if (!advancement)
-            return;
+        runAdvanceParams(AdvancementParamType.status_effects_food, () -> {
+            for (Pair<StatusEffectInstance, Float> statusEffect : foodComponent.statusEffects) {
+                StatusEffectInstance first = statusEffect.getFirst();
+                StatusEffectInstanceType type = statusEffectInstanceInit(first);
+                serializable.type.asFood.statusEffects(type, statusEffect.getSecond());
+            }
+        });
 
-        if (!types.contains(AdvancementParamType.status_effects_food) || hasTypes.get())
-            return;
 
-        for (Pair<StatusEffectInstance, Float> statusEffect : foodComponent.statusEffects) {
-            StatusEffectInstance first = statusEffect.getFirst();
-            StatusEffectInstanceType type = statusEffectInstanceInit(first);
-            serializable.type.asFood.statusEffects(type, statusEffect.getSecond());
-        }
 
     }
 
@@ -260,33 +253,28 @@ public class ItemAndBlockHelper extends BasicHelper {
 
             blockType.randomTicks = defaultState.hasRandomTicks();
             blockType.lootTableId = block.getLootTableId().toString();
-            if (!advancement)
-                return;
-            if (types.contains(AdvancementParamType.has_sided_transparency_block) || !hasTypes.get()) {
-                blockType.hasSidedTransparency = defaultState.hasSidedTransparency();
-            }
-            if (types.contains(AdvancementParamType.block_level_1) || !hasTypes.get()) {
+            runAdvanceParams(AdvancementParamType.block_level_1, () -> {
                 //空气 透明度 可被其他方块替换(草) 可燃 光滑度
                 blockType.isAir = defaultState.isAir();
                 blockType.opaque = defaultState.isOpaque();
                 blockType.replaceable = defaultState.isReplaceable();
                 blockType.burnable = defaultState.isBurnable();
                 blockType.slipperiness = block.getSlipperiness();
-            }
-            if (types.contains(AdvancementParamType.block_level_2) || !hasTypes.get()) {
+            });
+            runAdvanceParams(AdvancementParamType.block_level_2, () -> {
                 //起跳性质，速度性质
                 blockType.velocityMultiplier = block.getVelocityMultiplier();
                 blockType.jumpVelocityMultiplier = block.getJumpVelocityMultiplier();
-            }
-            if (types.contains(AdvancementParamType.block_level_3) || !hasTypes.get()) {
+            });
+            runAdvanceParams(AdvancementParamType.block_level_3, () -> {
                 blockType.collidable = block.collidable;
-            }
-            if (types.contains(AdvancementParamType.block_level_4) || !hasTypes.get()) {
+                blockType.hasSidedTransparency = defaultState.hasSidedTransparency();
+            });
+            runAdvanceParams(AdvancementParamType.block_level_4, () -> {
                 //第四序列,弃用方法的高级导出
                 blockType.liquid = defaultState.isLiquid();
                 blockType.solid = defaultState.isSolid();
-
-            }
+            });
 
             blockType.blockBreakParticles = defaultState.hasBlockBreakParticles();
 
@@ -335,18 +323,18 @@ public class ItemAndBlockHelper extends BasicHelper {
     }
 
     public void initItem(ItemStack stack, BlockAndItemSerializable serializable, ItemGroup group) {
-        defaultItemProperties(stack, serializable, group, ctx, advancement);
+        defaultItemProperties(stack, serializable, group, ctx);
 //        ItemAndBlockUtils.tabPut(group, serializable);
 
     }
 
     public void defaultItemProperties(ItemStack stack,
                                              BlockAndItemSerializable blockAndItem,
-                                             ItemGroup group, CommandContext<ServerCommandSource> ctx, boolean advancement) {
+                                             ItemGroup group, CommandContext<ServerCommandSource> ctx) {
         ServerPlayerEntity player = ctx.getSource().getPlayer();
 
         blockAndItem.type = itemType(itemType -> {
-            tooltipSet(stack, advancement, itemType, player);
+            tooltipSet(stack, itemType, player);
             itemType.maxStackSize = stack.getItem().getMaxCount();
             itemType.maxDurability = stack.getItem().getMaxDamage();
             stack.streamTags().forEach(itemTagKey -> {
@@ -370,11 +358,8 @@ public class ItemAndBlockHelper extends BasicHelper {
         }
     }
 
-    private void tooltipSet(ItemStack stack, boolean advancement, ItemType itemType, ServerPlayerEntity player) {
-        if (!advancement) {
-            return;
-        }
-        if (types.contains(AdvancementParamType.basic_tooltip) || !hasTypes.get()) {
+    private void tooltipSet(ItemStack stack, ItemType itemType, ServerPlayerEntity player) {
+        runAdvanceParams(AdvancementParamType.basic_tooltip, () -> {
             List<Text> basic = stack.getTooltip(player, TooltipContext.BASIC);
 
             basic.forEach(text -> {
@@ -383,8 +368,8 @@ public class ItemAndBlockHelper extends BasicHelper {
                 basicTooltip.name = get(text, false, basicTooltip);
                 itemType.basicTooltip(basicTooltip);
             });
-        }
-        if (types.contains(AdvancementParamType.advance_tooltip) || !hasTypes.get()) {
+        });
+        runAdvanceParams(AdvancementParamType.advance_tooltip, () -> {
             List<Text> tooltip1 = stack.getTooltip(player, TooltipContext.ADVANCED);
             tooltip1.forEach(text -> {
                 NameType advanceToolTip = new NameType();
@@ -392,7 +377,7 @@ public class ItemAndBlockHelper extends BasicHelper {
                 advanceToolTip.name = get(text, false, advanceToolTip);
                 itemType.basicTooltip(advanceToolTip);
             });
-        }
+        });
     }
 
     public ArrayList<ItemGroup> getGroups() {

@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class BasicHelper {
     protected static final Path exporter = Mod.getGameFolder().resolve("exporter");
@@ -20,17 +21,23 @@ public abstract class BasicHelper {
     protected final Path modidDir;
 
     protected final BlockAndItems blockAndItems;
-
-    protected final boolean advancement;
     protected final List<AdvancementParamType> types;
+
+    public final AtomicBoolean hasTypes = new AtomicBoolean();
+
+    protected void runAdvanceParams(AdvancementParamType type, Runnable runnable) {
+        if (types == null) return;
+        if (!hasTypes.get() || types.contains(type)) runnable.run();
+    }
 
     public BasicHelper(String modid, boolean advancement, CommandContext<ServerCommandSource> ctx, AdvancementParamType[] types) {
         this.ctx = ctx;
         this.modid = modid;
-        this.advancement = advancement;
         blockAndItems = new BlockAndItems();
         modidDir = exporter.resolve(modid);
-        this.types = Arrays.asList(types);
+        this.types = advancement ? Arrays.asList(types) : new ArrayList<>();
+        if (!this.types.isEmpty())
+            hasTypes.set(true);
         replaceDirPath(modidDir);
     }
 
